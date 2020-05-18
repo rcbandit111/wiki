@@ -21,7 +21,7 @@ import java.util.HashMap;
 
 @Configuration
 @EnableJpaRepositories(
-	    basePackages = "org.engine.entity.production",
+	    basePackages = "org.engine.production.service",
 	    entityManagerFactoryRef = "productionEntityManagerFactory", 
 	    transactionManagerRef = "productionTransactionManager"
 	)
@@ -67,7 +67,7 @@ public class ContextProductionDatasource {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(DS1DataSource());
 		em.setPersistenceUnitName("DS1");
-		em.setPackagesToScan(new String[] { "org.engine.entity.production" });
+		em.setPackagesToScan(new String[] { "org.engine.production.entity" });
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();

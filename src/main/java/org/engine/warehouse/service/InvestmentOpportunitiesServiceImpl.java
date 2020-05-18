@@ -1,12 +1,11 @@
-package org.engine.repository;
+package org.engine.warehouse.service;
 
-import org.engine.entity.warehouse.InvestmentOpportunities;
+import org.engine.warehouse.entity.InvestmentOpportunities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

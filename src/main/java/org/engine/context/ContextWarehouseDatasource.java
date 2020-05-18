@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 @Configuration
 @EnableJpaRepositories(
-	    basePackages = "org.engine.entity.warehouse",
+	    basePackages = "org.engine.warehouse.service",
 	    entityManagerFactoryRef = "warehouseEntityManagerFactory",
 	    transactionManagerRef = "warehouseTransactionManager"
 	)
@@ -63,7 +63,7 @@ public class ContextWarehouseDatasource {
 		LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
 		em.setDataSource(DS2DataSource());
 		em.setPersistenceUnitName("DS2");
-		em.setPackagesToScan(new String[] { "org.engine.entity.warehouse" });
+		em.setPackagesToScan(new String[] { "org.engine.warehouse.entity" });
 		HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();

@@ -1,12 +1,11 @@
-package org.engine.repository;
+package org.engine.warehouse.service;
 
-import org.engine.entity.warehouse.SuccessStories;
+import org.engine.warehouse.entity.UserStories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,44 +15,44 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@Qualifier("successStoriesService")
+@Qualifier("userStoriesService")
 @Transactional
-public class SuccessStoriesServiceImpl implements SuccessStoriesService {
+public class UserStoriesServiceImpl implements UserStoriesService {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    private SuccessStoriesRepository dao;
+    private UserStoriesRepository dao;
 
 
     @Override
-    public Optional<SuccessStories> findByName(String name) {
+    public Optional<UserStories> findByName(String name) {
         return Optional.empty();
     }
 
     @Override
-    public Optional<SuccessStories> findById(Integer id) {
+    public Optional<UserStories> findById(Integer id) {
         return Optional.empty();
     }
 
     @Override
-    public Iterable<SuccessStories> findAll() {
+    public Iterable<UserStories> findAll() {
         return null;
     }
 
     @Override
-    public Iterable<SuccessStories> findAll(List<Integer> ids) {
+    public Iterable<UserStories> findAll(List<Integer> ids) {
         return null;
     }
 
     @Override
-    public void save(SuccessStories entity) {
+    public void save(UserStories entity) {
 
     }
 
     @Override
-    public Page<SuccessStories> getAllBySpecification(Specification<SuccessStories> specification, Pageable pageable) {
+    public Page<UserStories> getAllBySpecification(Specification<UserStories> specification, Pageable pageable) {
         return null;
     }
 }

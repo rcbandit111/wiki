@@ -1,6 +1,6 @@
-package org.engine.repository;
+package org.engine.production.service;
 
-import org.engine.entity.production.Users;
+import org.engine.production.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

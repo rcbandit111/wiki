@@ -1,6 +1,6 @@
-package org.engine.repository;
+package org.engine.warehouse.service;
 
-import org.engine.entity.warehouse.InvestmentOpportunities;
+import org.engine.warehouse.entity.InvestmentOpportunities;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

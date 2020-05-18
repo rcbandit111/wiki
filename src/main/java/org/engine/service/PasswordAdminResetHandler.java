@@ -1,7 +1,7 @@
 package org.engine.service;
 
-import org.engine.entity.production.Users;
-import org.engine.repository.UsersService;
+import org.engine.production.entity.Users;
+import org.engine.production.service.UsersService;
 import org.engine.security.JwtTokenUtil;
 import org.engine.security.JwtUser;
 import org.springframework.beans.factory.annotation.Autowired;

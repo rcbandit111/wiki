@@ -1,6 +1,6 @@
-package org.engine.repository;
+package org.engine.warehouse.service;
 
-import org.engine.entity.warehouse.UserStories;
+import org.engine.warehouse.entity.UserStories;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

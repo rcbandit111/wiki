@@ -1,4 +1,4 @@
-package org.engine.entity.production;
+package org.engine.warehouse.entity;
 
 import lombok.*;
 import org.engine.utils.LocalDateTimeConverter;
@@ -13,19 +13,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "sessions")
-public class Sessions implements Serializable {
+@Table(name = "user_stories")
+public class UserStories implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
     private int id;
 
-    @Column(name = "session_id", length = 255)
-    private String sessionId;
+    @Column(length = 255)
+    private String name;
 
     @Column(length = 255)
-    private String data;
+    private String type;
+
+    @Column(name = "created_by", length = 4)
+    private Integer createdBy;
 
     @Column(name = "created_at")
     @Convert(converter = LocalDateTimeConverter.class)
@@ -34,4 +37,5 @@ public class Sessions implements Serializable {
     @Column(name = "updated_at")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime updatedAt;
+
 }

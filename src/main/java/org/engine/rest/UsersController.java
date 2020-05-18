@@ -5,15 +5,13 @@ import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.engine.dto.AuthenticationDTO;
-import org.engine.entity.production.OldPasswords;
-import org.engine.entity.production.Users;
+import org.engine.production.entity.Users;
 import org.engine.mapper.UserMapper;
-import org.engine.repository.OldPasswordsService;
-import org.engine.repository.UsersService;
+import org.engine.production.service.OldPasswordsService;
+import org.engine.production.service.UsersService;
 import org.engine.rest.dto.UserDTO;
 import org.engine.rest.dto.UserNewDTO;
 import org.engine.security.JwtTokenUtil;
-import org.engine.security.JwtUser;
 import org.engine.service.PasswordAdminResetHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +25,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
 
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;

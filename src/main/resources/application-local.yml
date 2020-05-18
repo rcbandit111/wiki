@@ -5,8 +5,21 @@ logging:
         com:
             backend: DEBUG
         org:
-            springframework: DEBUG
-            springframework.web: DEBUG
+            springframework: INFO
+            springframework.web: ERROR
+app:
+    admin:
+        confirm-url: /admin/auth/password?token=
+        reset-url: /admin/auth/new?token=
+        url: http://185.185.126.15
+    email:
+        reset:
+            content: 'Go to the link provided to reset your password: %s'
+            subject: Password reset subject
+        sending-enabled: true
+jwt:
+    expiration: 3600
+    secret: test112322
 server:
     port: 8080
     servlet:
@@ -26,6 +39,23 @@ spring:
         default-property-inclusion: non_null
     jmx:
         enabled: false
+    mail:
+        default-encoding: UTF-8
+        host: smtp-relay.sendinblue.com
+        password: 5jzOYV6KpQLgGJrq
+        port: 587
+        properties:
+            mail:
+                smtp:
+                    auth: true
+                    connectiontimeout: 5000
+                    starttls:
+                        enable: true
+                    timeout: 5000
+                    writetimeout: 5000
+        protocol: smtp
+        test-connection: true
+        username: peter.penzov@gmail.com
     production:
         datasource:
             driver-class-name: org.mariadb.jdbc.Driver

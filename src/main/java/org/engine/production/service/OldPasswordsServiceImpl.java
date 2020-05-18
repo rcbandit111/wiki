@@ -1,7 +1,6 @@
-package org.engine.repository;
+package org.engine.production.service;
 
-import org.engine.entity.production.OldPasswords;
-import org.engine.entity.warehouse.InvestmentOpportunities;
+import org.engine.production.entity.OldPasswords;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
