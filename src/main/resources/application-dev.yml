@@ -1,0 +1,54 @@
+logging:
+    file:
+        name: ${java.io.tmpdir}/application.log
+    level:
+        com:
+            backend: DEBUG
+        org:
+            springframework: INFO
+            springframework.web: ERROR
+server:
+    port: 8080
+    servlet:
+        context-path: /engine
+security:
+    jwt:
+        token:
+            secret-key: secret-key
+            expire-length: 300000 # 5 minutes duration by default: 5 minutes * 60 seconds * 1000 miliseconds
+spring:
+    profiles:
+        active: local 
+    data:
+        rest:
+            basePath: /engine
+    jackson:
+        default-property-inclusion: non_null
+    jmx:
+        enabled: false
+    production:
+        datasource:
+            driver-class-name: org.mariadb.jdbc.Driver
+            jdbc-url: jdbc:mariadb://localhost:3306/engine_production
+            jpa:
+                hibernate:
+                    ddl-auto: update
+                properties:
+                    hibernate:
+                        dialect: org.hibernate.dialect.MariaDBDialect
+                show-sql: true
+            password: qwerty
+            username: root    
+    warehouse:
+        datasource:
+            driver-class-name: org.mariadb.jdbc.Driver
+            jdbc-url: jdbc:mariadb://localhost:3306/engine_warehouse
+            jpa:
+                hibernate:
+                    ddl-auto: update
+                properties:
+                    hibernate:
+                        dialect: org.hibernate.dialect.MariaDBDialect
+                show-sql: true
+            password: qwerty
+            username: root
