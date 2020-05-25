@@ -68,7 +68,7 @@ public class ContextWarehouseDatasource {
 		em.setJpaVendorAdapter(vendorAdapter);
 		HashMap<String, Object> properties = new HashMap<>();
 		properties.put("javax.persistence.create-database-schemas", true);
-		properties.put(AvailableSettings.HBM2DDL_AUTO, environment.getProperty("spring.jpa.hibernate.ddl-auto"));
+		properties.put(AvailableSettings.HBM2DDL_AUTO, environment.getProperty("spring.warehouse.datasource.jpa.hibernate.ddl-auto"));
 		em.setJpaPropertyMap(properties);
 		return em;
 	}
