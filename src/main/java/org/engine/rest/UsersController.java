@@ -4,7 +4,8 @@ import net.kaczmarzyk.spring.data.jpa.domain.In;
 import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
-import org.engine.dto.AuthenticationDTO;
+import org.engine.dto.*;
+import org.engine.production.entity.OldPasswords;
 import org.engine.production.entity.Users;
 import org.engine.mapper.UserMapper;
 import org.engine.production.service.OldPasswordsService;
@@ -12,6 +13,7 @@ import org.engine.production.service.UsersService;
 import org.engine.rest.dto.UserDTO;
 import org.engine.rest.dto.UserNewDTO;
 import org.engine.security.JwtTokenUtil;
+import org.engine.security.JwtUser;
 import org.engine.service.PasswordAdminResetHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
 
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
@@ -59,10 +64,14 @@ public class UsersController {
      * @return
      */
     @PostMapping("authorize_request")
-    public ResponseEntity<?> authorizeRequest(@RequestBody AuthenticationDTO resetDTO) {
-
+    public ResponseEntity<?> authorizeRequest(@Valid @RequestBody AuthenticationDTO resetDTO) {
+        // TODO - for remove - Spring Security should handle this request
         return null;
     }
+
+    // Reset password page
+
+    // Step 1 - from login page user enters e-mail to send new password
 
     /**
      * Endpoint used to send e-mail reset password request.
@@ -70,39 +79,177 @@ public class UsersController {
      * @return
      */
     @PostMapping("reset_request")
-    public ResponseEntity<?> resetRequest(@RequestBody AuthenticationDTO resetDTO) {
+    public ResponseEntity<?> resetRequest(@Valid @RequestBody AuthenticationDTO resetDTO) {
 
-        return null;
+        return userService.findByLogin(resetDTO.getName()).map(user -> {
+
+            if (!user.getEmail().equals(resetDTO.getEmail())) {
+                return new ResponseEntity<>("NAME_AND_EMAIL_MISMATCH", HttpStatus.BAD_REQUEST);
+            }
+
+            resetHandler.sendResetMail(user);
+
+            return ok(resetDTO);
+        })
+                .orElseGet(() -> notFound().build());
     }
 
+    // Step 2 - user opens link from e-mail
+
+    /**
+     * Called when link from reset e-mail is opened
+     * @param resetDTO
+     * @return
+     */
     @PostMapping("reset_token")
-    public ResponseEntity<?> reset_token(@RequestBody AuthenticationDTO resetDTO) {
+    public ResponseEntity<?> resetToken(@Valid @RequestBody ResetPasswordTokenDTO resetDTO) {
 
-        return null;
+        return userService.findByResetPasswordToken(resetDTO.getResetPasswordToken()).map(user -> {
+
+            // TODO - we have a window of 24 hours to open the reset link from e-mail. If it's old return not found
+
+            user.setResetPasswordToken(null);
+            resetDTO.setStatus(HttpStatus.OK.value()); // Return status 200
+
+            userService.save(user);
+
+            return ok(resetDTO);
+
+        }).orElseGet(() -> notFound().build());
     }
+
+    // Step 3 - user submits new password using web form
+
+    /**
+     * Called when server sends status 200 for token confirmation and form is submitted
+     * @param resetDTO
+     * @return
+     */
+    @PostMapping("reset_password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetDTO) {
+
+        if(!jwtTokenUtil.validateToken(resetDTO.getConfirmationPasswordToken(), new JwtUser(resetDTO.getName())))
+        {
+            return new ResponseEntity<>("INVALID_TOKEN", HttpStatus.BAD_REQUEST);
+        }
+        else
+        {
+            return this.userService.findByLogin(resetDTO.getName()).map(user -> {
+
+                Integer userId = user.getId();
+
+                List<OldPasswords> list = oldPasswordsService.findByOwnerId(userId);
+
+                if (!list.isEmpty() && !list.isEmpty()) {
+
+                    for (int i = 0; i < list.size(); i++) {
+                        OldPasswords value = list.get(i);
+
+                        boolean matches = passwordEncoder.matches(resetDTO.getPassword(), value.getEncryptedPassword());
+                        if (matches) {
+                            return new ResponseEntity<>("PASSWORD_ALREADY_USED", HttpStatus.BAD_REQUEST);
+                        }
+                    }
+                }
+
+                OldPasswords oldPasswords = new OldPasswords();
+                oldPasswords.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+                oldPasswords.setPasswordOwnerId(userId);
+                oldPasswords.setPasswordOwnerType("user");
+                oldPasswords.setCreatedAt(LocalDateTime.now());
+                oldPasswordsService.save(oldPasswords);
+
+                user.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+
+                user.setResetPasswordToken(null);
+                userService.save(user);
+                return ok().build();
+            }).orElseGet(() -> notFound().build());
+        }
+    }
+
+    // Activate password when new user is created
+
+    // user receives e-mail with activation link
 
     @PostMapping("confirmation_token")
-    public ResponseEntity<?> confirmation_token(@RequestBody AuthenticationDTO resetDTO) {
+    public ResponseEntity<?> confirmationToken(@Valid @RequestBody ActivatePasswordTokenDTO resetDTO) {
 
-        return null;
+        return userService.findByConfirmationToken(resetDTO.getConfirmationToken()).map(user -> {
+
+            // TODO - we have a window of 20 min to enter confirmation password into the form and submit it. If it's old return not found
+
+            user.setConfirmationToken(null);
+            user.setConfirmedAt(LocalDateTime.now());
+            resetDTO.setId(user.getId());
+            resetDTO.setName(user.getLogin());
+
+            userService.save(user);
+
+            return ok(resetDTO);
+
+        }).orElseGet(() -> notFound().build());
     }
 
-    @PostMapping("reset_password")
-    public ResponseEntity<?> reset(@RequestBody AuthenticationDTO resetDTO) {
+    // Step 2 User submits new password form
 
-        return null;
-    }
-
+    /**
+     * This is called from page New Password
+     * @param resetDTO
+     * @return
+     */
     @PostMapping("reset_user_password")
-    public ResponseEntity<?> resetUserPassword(@RequestBody AuthenticationDTO resetDTO) {
+    public ResponseEntity<?> resetUserPassword(@Valid @RequestBody ActivatePasswordDTO resetDTO) {
 
-        return null;
+        return this.userService.findByLogin(resetDTO.getName()).map(user -> {
+
+            if (oldPasswordsService.findEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword())).isPresent())
+            {
+                return new ResponseEntity<>("PASSWORD_ALREADY_USED", HttpStatus.BAD_REQUEST);
+            }
+            else
+            {
+                OldPasswords oldPasswords = new OldPasswords();
+                oldPasswords.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+                oldPasswords.setCreatedAt(LocalDateTime.now());
+                oldPasswordsService.save(oldPasswords);
+            }
+
+            if (!Objects.equals(resetDTO.getPassword(), resetDTO.getConfirmPassword())){
+                return new ResponseEntity<>("CONFIRMATION_PASSWORD_MISMATCH", HttpStatus.BAD_REQUEST);
+            }
+
+            if (passwordEncoder.matches(resetDTO.getOldPassword(), user.getEncryptedPassword())){
+                user.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+            } else {
+                return new ResponseEntity<>("OLD_PASSWORD_MISMATCH", HttpStatus.BAD_REQUEST);
+            }
+
+            user.setResetPasswordToken(null);
+            userService.save(user);
+            return ok().build();
+        }).orElseGet(() -> notFound().build());
     }
 
-    @PostMapping("reset_confirmation")
-    public ResponseEntity<?> reset_confirmation(@RequestBody AuthenticationDTO resetDTO) {
+    // New Password
 
-        return null;
+
+    /**
+     * Force user to set new password
+     * @param resetDTO
+     * @return
+     */
+    @PostMapping("reset_confirmation")
+    public ResponseEntity<?> resetConfirmation(@Valid @RequestBody AuthenticationDTO resetDTO) {
+
+        return this.userService.findByLogin(resetDTO.getName()).map(user -> {
+            user.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+
+            user.setResetPasswordToken(null);
+            user.setPasswordChangedAt(LocalDateTime.now());
+            userService.save(user);
+            return ok().build();
+        }).orElseGet(() -> notFound().build());
     }
 
 

@@ -28,6 +28,11 @@ public class AuthenticationDTO {
     @Size(min=8, max=15, message = "'Password' value '${validatedValue}' must be between {min} and {max} characters long.")
     private String password;
 
+    @NotNull
+    @NotEmpty
+    @Size(min=2, max=15, message = "'Email' value '${validatedValue}' must be between {min} and {max} characters long.")
+    private String email;
+
     // Server Response data
 
     private Integer status;
