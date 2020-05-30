@@ -17,6 +17,11 @@ public class ResetPasswordDTO {
 
     @NotNull
     @NotEmpty
+    @Size(min=3, max=10, message = "'Login' value '${validatedValue}' must be between {min} and {max} characters long.")
+    private String login;
+
+    @NotNull
+    @NotEmpty
     @Size(min=254, max=255, message = "'Reset Password Token' value '${validatedValue}' must be between {min} and {max} characters long.")
     private String resetPasswordToken;
 

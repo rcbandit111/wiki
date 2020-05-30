@@ -22,6 +22,11 @@ public class ResetPasswordTokenDTO {
 
     // Server Response data
 
+    @NotNull
+    @NotEmpty
+    @Size(min=3, max=10, message = "'Login' value '${validatedValue}' must be between {min} and {max} characters long.")
+    private String login;
+
     private Integer status;
 
     private String error;

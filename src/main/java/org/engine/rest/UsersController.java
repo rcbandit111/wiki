@@ -120,6 +120,7 @@ public class UsersController {
             {
                 user.setResetPasswordToken(null);
                 resetPasswordTokenDTO.setStatus(HttpStatus.OK.value()); // Return status 200
+                resetPasswordTokenDTO.setLogin(user.getLogin());
 
                 userService.save(user);
 
@@ -142,13 +143,13 @@ public class UsersController {
 
         // TODO - think how to get the name - we delete ResetPasswordToken from DB in step 2
 
-        if(!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(resetPasswordDTO.getName())))
+        if(!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(resetPasswordDTO.getLogin())))
         {
             return new ResponseEntity<>("INVALID_TOKEN", HttpStatus.BAD_REQUEST);
         }
         else
         {
-            return this.userService.findByLogin(resetPasswordDTO.getName()).map(user -> {
+            return this.userService.findByLogin(resetPasswordDTO.getLogin()).map(user -> {
 
                 Integer userId = user.getId();
 
@@ -184,8 +185,13 @@ public class UsersController {
 
     // Activate password when new user is created
 
-    // user receives e-mail with activation link
+    // Step 1 - user receives e-mail with activation link
 
+    /**
+     * Called when link from reset e-mail is opened
+     * @param activatePasswordTokenDTO
+     * @return
+     */
     @PostMapping("confirmation_token")
     public ResponseEntity<?> confirmationToken(@Valid @RequestBody ActivatePasswordTokenDTO activatePasswordTokenDTO) {
 
@@ -195,8 +201,8 @@ public class UsersController {
 
             user.setConfirmationToken(null);
             user.setConfirmedAt(LocalDateTime.now());
-            activatePasswordTokenDTO.setId(user.getId());
-            activatePasswordTokenDTO.setName(user.getLogin());
+//            activatePasswordTokenDTO.setId(user.getId());
+            activatePasswordTokenDTO.setLogin(user.getLogin());
 
             userService.save(user);
 
@@ -205,36 +211,36 @@ public class UsersController {
         }).orElseGet(() -> notFound().build());
     }
 
-    // Step 2 User submits new password form
+    // Step 2 - User submits new password form
 
     /**
      * This is called from page New Password
-     * @param resetDTO
+     * @param activatePasswordDTO
      * @return
      */
     @PostMapping("reset_user_password")
-    public ResponseEntity<?> resetUserPassword(@Valid @RequestBody ActivatePasswordDTO resetDTO) {
+    public ResponseEntity<?> resetUserPassword(@Valid @RequestBody ActivatePasswordDTO activatePasswordDTO) {
 
-        return this.userService.findByLogin(resetDTO.getName()).map(user -> {
+        return this.userService.findByLogin(activatePasswordDTO.getLogin()).map(user -> {
 
-            if (oldPasswordsService.findEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword())).isPresent())
+            if (oldPasswordsService.findEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword())).isPresent())
             {
                 return new ResponseEntity<>("PASSWORD_ALREADY_USED", HttpStatus.BAD_REQUEST);
             }
             else
             {
                 OldPasswords oldPasswords = new OldPasswords();
-                oldPasswords.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+                oldPasswords.setEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword()));
                 oldPasswords.setCreatedAt(LocalDateTime.now());
                 oldPasswordsService.save(oldPasswords);
             }
 
-            if (!Objects.equals(resetDTO.getPassword(), resetDTO.getConfirmPassword())){
+            if (!Objects.equals(activatePasswordDTO.getPassword(), activatePasswordDTO.getConfirmPassword())){
                 return new ResponseEntity<>("CONFIRMATION_PASSWORD_MISMATCH", HttpStatus.BAD_REQUEST);
             }
 
-            if (passwordEncoder.matches(resetDTO.getOldPassword(), user.getEncryptedPassword())){
-                user.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
+            if (passwordEncoder.matches(activatePasswordDTO.getPassword(), user.getEncryptedPassword())){
+                user.setEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword()));
             } else {
                 return new ResponseEntity<>("OLD_PASSWORD_MISMATCH", HttpStatus.BAD_REQUEST);
             }
@@ -246,7 +252,6 @@ public class UsersController {
     }
 
     // New Password
-
 
     /**
      * Force user to set new password
