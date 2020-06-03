@@ -1,6 +1,6 @@
-package org.engine.usermanagement.repository;
+package org.engine.production.service;
 
-import org.engine.usermanagement.model.Users;
+import org.engine.production.entity.Users;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
 
-public interface UsersRepository {
+public interface UsersService {
 
     Optional<Users> findByLogin(String login);
 

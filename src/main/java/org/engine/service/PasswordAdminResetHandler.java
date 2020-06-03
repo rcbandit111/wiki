@@ -1,7 +1,7 @@
 package org.engine.service;
 
-import org.engine.usermanagement.model.Users;
-import org.engine.usermanagement.repository.UsersRepository;
+import org.engine.production.entity.Users;
+import org.engine.production.service.UsersService;
 import org.engine.security.JwtTokenUtil;
 import org.engine.security.JwtUser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +42,7 @@ public class PasswordAdminResetHandler {
     private String secret;
 
     @Autowired
-    private UsersRepository userRepository;
+    private UsersService userRepository;
 
     public void sendResetMail(Users user) {
     	

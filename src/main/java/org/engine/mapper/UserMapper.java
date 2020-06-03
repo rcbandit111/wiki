@@ -1,7 +1,7 @@
 package org.engine.mapper;
 
 import org.engine.config.BaseMapperConfig;
-import org.engine.usermanagement.model.Users;
+import org.engine.production.entity.Users;
 import org.engine.rest.dto.UserDTO;
 import org.engine.rest.dto.UserFilter;
 import org.engine.rest.dto.UserFilterDTO;
