@@ -67,7 +67,7 @@ spring:
                     hibernate:
                         dialect: org.hibernate.dialect.MariaDBDialect
                 show-sql: true
-            password: qwerty
+            password:
             username: root    
     warehouse:
         datasource:
@@ -80,5 +80,5 @@ spring:
                     hibernate:
                         dialect: org.hibernate.dialect.MariaDBDialect
                 show-sql: true
-            password: qwerty
+            password:
             username: root

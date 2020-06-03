@@ -7,7 +7,7 @@
 	</appender>
 
 	<appender name="ROTATE_FILE_DAILY" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>/opt/engine.log</file>
+		<file>/home/yuriy/opt/engine.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>app-%d{yyyy-MM-dd}.log</fileNamePattern>
 		</rollingPolicy>
