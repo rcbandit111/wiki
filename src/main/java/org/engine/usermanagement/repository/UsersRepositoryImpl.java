@@ -1,6 +1,6 @@
-package org.engine.production.service;
+package org.engine.usermanagement.repository;
 
-import org.engine.production.entity.Users;
+import org.engine.usermanagement.model.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -19,13 +19,13 @@ import java.util.Optional;
 @Service
 @Qualifier("usersService")
 @Transactional
-public class UsersServiceImpl implements UsersService {
+public class UsersRepositoryImpl implements UsersRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Autowired
-    private UsersRepository dao;
+    private org.engine.production.service.UsersRepository dao;
 
 
     @Override

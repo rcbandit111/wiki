@@ -1,6 +1,6 @@
 package org.engine.service;
 
-import org.engine.production.service.UsersService;
+import org.engine.usermanagement.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -11,15 +11,16 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Component
 public class DbUserDetailsService implements UserDetailsService {
 
-    private UsersService userRepository;
+    private UsersRepository userRepository;
 
     @Autowired
-    public DbUserDetailsService(UsersService userRepository) {
+    public DbUserDetailsService(UsersRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -34,7 +35,7 @@ public class DbUserDetailsService implements UserDetailsService {
                             hasAccountExpired(user.getExpiredAt()),
                             hasPasswordExpired(user.getPasswordChangedAt()),
                             hasAccountLocked(user.getLockedAt()),
-                            List.of(new SimpleGrantedAuthority(user.getRole()))
+                            Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
                     );
                 }).orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
     }

@@ -1,4 +1,4 @@
-package org.engine.production.entity;
+package org.engine.usermanagement.model;
 
 import lombok.*;
 import org.engine.utils.LocalDateTimeConverter;
