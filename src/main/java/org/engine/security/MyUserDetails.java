@@ -1,7 +1,7 @@
 package org.engine.security;
 
-import org.engine.production.entity.Users;
-import org.engine.production.service.UsersService;
+import org.engine.usermanagement.model.Users;
+import org.engine.usermanagement.repository.UsersRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,11 +14,11 @@ import java.util.Optional;
 public class MyUserDetails implements UserDetailsService {
 
   @Autowired
-  private UsersService usersService;
+  private UsersRepository usersRepository;
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    final Optional<Users> user = usersService.findByLogin(username);
+    final Optional<Users> user = usersRepository.findByLogin(username);
 
     if (user == null) {
       throw new UsernameNotFoundException("User '" + username + "' not found");
