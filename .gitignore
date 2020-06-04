@@ -6,6 +6,17 @@
 *.war
 *.ear
 
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+**/nohup.out
+**/logs
+**/logfiles
+
 # Eclipse files #
 .settings
 .classpath
