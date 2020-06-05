@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -34,7 +35,7 @@ public class DbUserDetailsService implements UserDetailsService {
                             hasAccountExpired(user.getExpiredAt()),
                             hasPasswordExpired(user.getPasswordChangedAt()),
                             hasAccountLocked(user.getLockedAt()),
-                            List.of(new SimpleGrantedAuthority(user.getRole()))
+                            Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
                     );
                 }).orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
     }

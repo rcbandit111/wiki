@@ -17,6 +17,7 @@ import org.engine.security.JwtTokenUtil;
 import org.engine.security.JwtUser;
 import org.engine.service.PasswordAdminResetHandler;
 import org.engine.service.listener.OnRegistrationCompleteEvent;
+import org.engine.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,10 @@ public class UsersController {
     ApplicationEventPublisher eventPublisher;
 
     @Autowired
-    private UsersService userService;
+    private UsersService usersRepository;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private UserMapper user_mapper;
@@ -91,22 +95,9 @@ public class UsersController {
      */
     @PostMapping("reset_request")
     public ResponseEntity<?> resetRequest(@Valid @RequestBody ResetUserDTO resetUserDTO) {
-
-        return userService.findByLogin(resetUserDTO.getName()).map(user -> {
-
-            if (!user.getEmail().equals(resetUserDTO.getEmail())) {
-                return new ResponseEntity<>("NAME_AND_EMAIL_MISMATCH", HttpStatus.BAD_REQUEST);
-            } else {
-
-                user.setResetPasswordTokenSentAt(LocalDateTime.now());
-                userService.save(user);
-
-                resetHandler.sendResetMail(user);
-            }
-
-            return ok(resetUserDTO);
-        })
-                .orElseGet(() -> notFound().build());
+        return userService.resetRequest(resetUserDTO.getName(), resetUserDTO.getEmail()) ?
+                ok(resetUserDTO) :
+                notFound().build();
     }
 
     // Step 2 - user opens link from e-mail
@@ -120,7 +111,7 @@ public class UsersController {
     @PostMapping("reset_token")
     public ResponseEntity<?> resetToken(@Valid @RequestBody ResetPasswordTokenDTO resetPasswordTokenDTO) {
 
-        return userService.findByResetPasswordToken(resetPasswordTokenDTO.getResetPasswordToken()).map(user -> {
+        return usersRepository.findByResetPasswordToken(resetPasswordTokenDTO.getResetPasswordToken()).map(user -> {
 
             // We have a window of 24 hours to open the reset link from e-mail. If it's old return not found
             long hours = ChronoUnit.HOURS.between(user.getConfirmationSentAt(), LocalDateTime.now());
@@ -132,7 +123,7 @@ public class UsersController {
                 resetPasswordTokenDTO.setStatus(HttpStatus.OK.value()); // Return status 200
                 resetPasswordTokenDTO.setLogin(user.getLogin());
 
-                userService.save(user);
+                usersRepository.save(user);
 
                 return ok(resetPasswordTokenDTO);
             }
@@ -155,9 +146,11 @@ public class UsersController {
         // TODO - think how to get the name - we delete ResetPasswordToken from DB in step 2
 
         if (!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(resetPasswordDTO.getLogin()))) {
-            return new ResponseEntity<>("INVALID_TOKEN", HttpStatus.BAD_REQUEST);
-        } else {
-            return this.userService.findByLogin(resetPasswordDTO.getLogin()).map(user -> {
+            return new ResponseEntity<>("INVALID_TOKEN", HttpStatus.BAD_REQUEST)==
+        }
+        else
+        {
+            return this.usersRepository.findByLogin(resetPasswordDTO.getLogin()).map(user -> {
 
                 Integer userId = user.getId();
 
@@ -185,7 +178,7 @@ public class UsersController {
                 user.setEncryptedPassword(passwordEncoder.encode(resetPasswordDTO.getPassword()));
 
                 user.setResetPasswordToken(null);
-                userService.save(user);
+                usersRepository.save(user);
                 return ok().build();
             }).orElseGet(() -> notFound().build());
         }
@@ -204,7 +197,7 @@ public class UsersController {
     @PostMapping("confirmation_token")
     public ResponseEntity<?> confirmationToken(@Valid @RequestBody ActivatePasswordTokenDTO activatePasswordTokenDTO) {
 
-        return userService.findByConfirmationToken(activatePasswordTokenDTO.getConfirmationToken()).map(user -> {
+        return usersRepository.findByConfirmationToken(activatePasswordTokenDTO.getConfirmationToken()).map(user -> {
 
             // TODO - we have a window of 20 min to enter confirmation password into the form and submit it. If it's old return not found
 
@@ -213,7 +206,7 @@ public class UsersController {
 //            activatePasswordTokenDTO.setId(user.getId());
             activatePasswordTokenDTO.setLogin(user.getLogin());
 
-            userService.save(user);
+            usersRepository.save(user);
 
             return ok(activatePasswordTokenDTO);
 
@@ -231,7 +224,7 @@ public class UsersController {
     @PostMapping("reset_user_password")
     public ResponseEntity<?> resetUserPassword(@Valid @RequestBody ActivatePasswordDTO activatePasswordDTO) {
 
-        return this.userService.findByLogin(activatePasswordDTO.getLogin()).map(user -> {
+        return this.usersRepository.findByLogin(activatePasswordDTO.getLogin()).map(user -> {
 
             if (oldPasswordsService.findEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword())).isPresent()) {
                 return new ResponseEntity<>("PASSWORD_ALREADY_USED", HttpStatus.BAD_REQUEST);
@@ -253,7 +246,7 @@ public class UsersController {
             }
 
             user.setResetPasswordToken(null);
-            userService.save(user);
+            usersRepository.save(user);
             return ok().build();
         }).orElseGet(() -> notFound().build());
     }
@@ -269,12 +262,12 @@ public class UsersController {
     @PostMapping("reset_confirmation")
     public ResponseEntity<?> resetConfirmation(@Valid @RequestBody AuthenticationDTO resetDTO) {
 
-        return this.userService.findByLogin(resetDTO.getName()).map(user -> {
+        return this.usersRepository.findByLogin(resetDTO.getName()).map(user -> {
             user.setEncryptedPassword(passwordEncoder.encode(resetDTO.getPassword()));
 
             user.setResetPasswordToken(null);
             user.setPasswordChangedAt(LocalDateTime.now());
-            userService.save(user);
+            usersRepository.save(user);
             return ok().build();
         }).orElseGet(() -> notFound().build());
     }
@@ -413,7 +406,7 @@ public class UsersController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
-        return userService
+        return usersRepository
                 .findById(id)
                 .map(user_mapper::toNewDTO)
                 .map(ResponseEntity::ok)
@@ -422,11 +415,11 @@ public class UsersController {
 
     @PostMapping("{id}")
     public ResponseEntity<?> save(@PathVariable Integer id, @RequestBody UserNewDTO dto) {
-        return userService
+        return usersRepository
                 .findById(id)
                 .map(user -> {
                     user.update(user_mapper.map(dto));
-                    userService.save(user);
+                    usersRepository.save(user);
                     return user;
                 })
                 .map(ResponseEntity::ok).orElseGet(() -> notFound().build());
@@ -442,7 +435,7 @@ public class UsersController {
             }) Specification<Users> specification,
             Pageable pageable
     ) {
-        return userService.getAllBySpecification(specification, pageable)
+        return usersRepository.getAllBySpecification(specification, pageable)
                 .map(g -> UserNewDTO.builder()
                         .id(g.getId())
                         .login(g.getLogin())
@@ -495,12 +488,11 @@ public class UsersController {
 
 //        PasswordAdminResetHandler.class has too much responsibilities
 //        resetHandler.sendConfirmMail(user);
-
         return ok().build();
     }
 
     @GetMapping("pages")
     public Page<UserDTO> pages(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
-        return userService.findAll(page, size).map(user_mapper::toDTO);
+        return usersRepository.findAll(page, size).map(user_mapper::toDTO);
     }
 }
