@@ -1,7 +1,10 @@
 package org.engine.exception;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public enum ErrorDetail {
 
 	NOT_FOUND("1000", "Not found", "Not found", "Not found", HttpStatus.NOT_FOUND),
@@ -20,28 +23,6 @@ public enum ErrorDetail {
 		this.detail = detail;
 		this.title = title;
 		this.httpStatus = httpStatus;
-	}
-
-	public String getErrorCode()
-	{
-		return this.errorCode;
-	}
-
-	public String getTitle() {
-		return this.title;
-	}
-
-	public String getMessage()
-	{
-		return this.message;
-	}
-
-	public HttpStatus getHttpStatus(){
-		return this.httpStatus;
-	}
-	
-	public String getDetail(){
-		return this.detail;
 	}
 
 	public static HttpStatus getHttpStatusBasedOnErrorCode(String errorCode) {

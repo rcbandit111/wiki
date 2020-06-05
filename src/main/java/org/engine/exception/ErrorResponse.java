@@ -47,7 +47,6 @@ public class ErrorResponse extends Throwable {
 	}
 
 	public ErrorResponse(){
-
 	}
 
 	public void setDetail(String detail) {
@@ -65,6 +64,4 @@ public class ErrorResponse extends Throwable {
 	public void setExtra(Map<String, String> extra) {
 		this.extra = extra;
 	}
-	
-	
 }
