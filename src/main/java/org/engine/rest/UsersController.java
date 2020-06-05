@@ -5,26 +5,29 @@ import net.kaczmarzyk.spring.data.jpa.domain.LikeIgnoreCase;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 import org.engine.dto.*;
+import org.engine.mapper.UserMapper;
 import org.engine.production.entity.OldPasswords;
 import org.engine.production.entity.Users;
-import org.engine.mapper.UserMapper;
 import org.engine.production.service.OldPasswordsService;
 import org.engine.production.service.UsersService;
+import org.engine.rest.dto.NewUserDTO;
 import org.engine.rest.dto.UserDTO;
 import org.engine.rest.dto.UserNewDTO;
 import org.engine.security.JwtTokenUtil;
 import org.engine.security.JwtUser;
 import org.engine.service.PasswordAdminResetHandler;
+import org.engine.service.listener.OnRegistrationCompleteEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -37,9 +40,14 @@ import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @RequestMapping("/users")
+//@Slf4j
 public class UsersController {
 
-    private static final Logger LOG = LoggerFactory.getLogger(UsersController.class);
+    //    for this purposes exist lombok  @Slf4j
+    private static final Logger log = LoggerFactory.getLogger(UsersController.class);
+
+    @Autowired
+    ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private UsersService userService;
@@ -61,6 +69,7 @@ public class UsersController {
 
     /**
      * Endpoint used to send session authorization request.
+     *
      * @param resetDTO
      * @return
      */
@@ -76,6 +85,7 @@ public class UsersController {
 
     /**
      * Endpoint used to send e-mail reset password request.
+     *
      * @param resetUserDTO
      * @return
      */
@@ -103,6 +113,7 @@ public class UsersController {
 
     /**
      * Called when link from reset e-mail is opened
+     *
      * @param resetPasswordTokenDTO
      * @return
      */
@@ -116,8 +127,7 @@ public class UsersController {
 
             // TODO - add logic to get the time also from the token and make a check
 
-            if(hours <= 24)
-            {
+            if (hours <= 24) {
                 user.setResetPasswordToken(null);
                 resetPasswordTokenDTO.setStatus(HttpStatus.OK.value()); // Return status 200
                 resetPasswordTokenDTO.setLogin(user.getLogin());
@@ -135,6 +145,7 @@ public class UsersController {
 
     /**
      * Called when server sends status 200 for token confirmation and form is submitted
+     *
      * @param resetPasswordDTO
      * @return
      */
@@ -143,12 +154,9 @@ public class UsersController {
 
         // TODO - think how to get the name - we delete ResetPasswordToken from DB in step 2
 
-        if(!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(resetPasswordDTO.getLogin())))
-        {
+        if (!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(resetPasswordDTO.getLogin()))) {
             return new ResponseEntity<>("INVALID_TOKEN", HttpStatus.BAD_REQUEST);
-        }
-        else
-        {
+        } else {
             return this.userService.findByLogin(resetPasswordDTO.getLogin()).map(user -> {
 
                 Integer userId = user.getId();
@@ -189,6 +197,7 @@ public class UsersController {
 
     /**
      * Called when link from reset e-mail is opened
+     *
      * @param activatePasswordTokenDTO
      * @return
      */
@@ -215,6 +224,7 @@ public class UsersController {
 
     /**
      * This is called from page New Password
+     *
      * @param activatePasswordDTO
      * @return
      */
@@ -223,23 +233,20 @@ public class UsersController {
 
         return this.userService.findByLogin(activatePasswordDTO.getLogin()).map(user -> {
 
-            if (oldPasswordsService.findEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword())).isPresent())
-            {
+            if (oldPasswordsService.findEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword())).isPresent()) {
                 return new ResponseEntity<>("PASSWORD_ALREADY_USED", HttpStatus.BAD_REQUEST);
-            }
-            else
-            {
+            } else {
                 OldPasswords oldPasswords = new OldPasswords();
                 oldPasswords.setEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword()));
                 oldPasswords.setCreatedAt(LocalDateTime.now());
                 oldPasswordsService.save(oldPasswords);
             }
 
-            if (!Objects.equals(activatePasswordDTO.getPassword(), activatePasswordDTO.getConfirmPassword())){
+            if (!Objects.equals(activatePasswordDTO.getPassword(), activatePasswordDTO.getConfirmPassword())) {
                 return new ResponseEntity<>("CONFIRMATION_PASSWORD_MISMATCH", HttpStatus.BAD_REQUEST);
             }
 
-            if (passwordEncoder.matches(activatePasswordDTO.getPassword(), user.getEncryptedPassword())){
+            if (passwordEncoder.matches(activatePasswordDTO.getPassword(), user.getEncryptedPassword())) {
                 user.setEncryptedPassword(passwordEncoder.encode(activatePasswordDTO.getPassword()));
             } else {
                 return new ResponseEntity<>("OLD_PASSWORD_MISMATCH", HttpStatus.BAD_REQUEST);
@@ -255,6 +262,7 @@ public class UsersController {
 
     /**
      * Force user to set new password
+     *
      * @param resetDTO
      * @return
      */
@@ -270,7 +278,6 @@ public class UsersController {
             return ok().build();
         }).orElseGet(() -> notFound().build());
     }
-
 
 
 //    @PostMapping("request")
@@ -450,27 +457,44 @@ public class UsersController {
     }
 
     @PostMapping("create")
-    public ResponseEntity<?> create(@RequestBody UserNewDTO dto) {
-        if(userService.findByLogin(dto.getLogin()).isPresent()) {
+    public ResponseEntity<?> create(@RequestBody NewUserDTO dto) {
+//        it's redundant checking by email enough
+        if (userService.findByLogin(dto.getLogin()).isPresent()) {
             return new ResponseEntity<>("USER_EXISTS", HttpStatus.BAD_REQUEST);
         }
-        if(userService.findByEmail(dto.getEmail()).isPresent()) {
+        if (userService.findByEmail(dto.getEmail()).isPresent()) {
             return new ResponseEntity<>("EMAIL_EXISTS", HttpStatus.BAD_REQUEST);
         }
 
-        Users obj = new Users();
-        obj.setLogin(dto.getLogin());
-        obj.setEmail(dto.getEmail());
-        obj.setFirstName(dto.getFirstName());
-        obj.setLastName(dto.getLastName());
-        obj.setRole(dto.getRole());
-        obj.setType("AdminUser");
-        obj.setEnabled(dto.getEnabled());
-        obj.setCreatedAt(LocalDateTime.now());
+//        handling dto move to userService
+        Users user = new Users();
+        user.setLogin(dto.getLogin());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+//        there are roles and privileges. https://www.baeldung.com/role-and-privilege-for-spring-security-registration
+//        user.setType("AdminUser");
+        user.setCreatedAt(LocalDateTime.now());
+        user.setPassword(dto.getPassword());
+        userService.save(user);
+        /**
+         * why you use an eventPublisher for event OnRegistrationCompleteEvent ?
+         *
+         * This is basically a design decision. You want to decouple the controller’s responsibility from the the email
+         * sending logic.This makes sense for 2 reasons:
+         * 1.We have an implementation independent listener.
+         * So, if we later need to change how a user should be alerted to confirm his account all we need is to change
+         * is the listener’s implementation.
+         * 2.The controller’s logic should be kept simple and centered in processing requests and handling DTO objects.
+         * Keep in mind that the VerificationToken is not part of the DTO object.
+         * I hope this makes sense.
+         * */
 
-        userService.save(obj);
 
-        resetHandler.sendConfirmMail(obj);
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(user));
+
+//        PasswordAdminResetHandler.class has too much responsibilities
+//        resetHandler.sendConfirmMail(user);
 
         return ok().build();
     }
