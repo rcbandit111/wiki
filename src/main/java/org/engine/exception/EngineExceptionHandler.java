@@ -9,8 +9,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -62,12 +60,20 @@ public class EngineExceptionHandler {
 		return new ResponseEntity<ErrorResponseDTO>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
-	private static void printStack(final Exception e)
-	{
-		final StringWriter sw = new StringWriter();
-		final PrintWriter pw = new PrintWriter(sw);
-		e.printStackTrace(pw);
-		final String sStackTrace = sw.toString();
-		LOG.error(sStackTrace);
+	@ExceptionHandler(BaseException.class)
+	public ResponseEntity<ErrorResponseDTO> handleException(BaseException ex) {
+		LOG.error(ex.getMessage(), ex.getCause());
+		ErrorResponse errorEntry = new ErrorResponse();
+		errorEntry.setTitle(ex.getTitle());
+		errorEntry.setCode(ex.getErrorCode());
+		HttpStatus httpStatus = ErrorDetail.getHttpStatusBasedOnErrorCode(ex.getErrorCode());
+		errorEntry.setStatus(httpStatus.value());
+		errorEntry.setDetail(ex.getMessage());
+		errorEntry.setExtra(ex.getExtra());
+
+		ErrorResponseDTO errorResponse = new ErrorResponseDTO();
+		errorResponse.setErrors(Arrays.asList(errorEntry));
+
+		return new ResponseEntity<ErrorResponseDTO>(errorResponse, httpStatus);
 	}
 }

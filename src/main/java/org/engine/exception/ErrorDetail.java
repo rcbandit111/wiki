@@ -1,13 +1,12 @@
 package org.engine.exception;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
 @Getter
-public enum ErrorDetail {
+public enum ErrorDetail implements ErrorInfo {
 
-	NOT_FOUND("1000", "Not found", "Not found", "Not found", HttpStatus.NOT_FOUND),
+	NOT_FOUND("1000", "Message not found", "Detail not found", "Title not found", HttpStatus.NOT_FOUND),
 	TEMPLATE_NOT_FOUND("1001", "Template not found", "Internal Error", "Internal Error", HttpStatus.NOT_FOUND);
 
 	private String errorCode;
