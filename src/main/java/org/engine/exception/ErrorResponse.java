@@ -7,7 +7,7 @@ import java.util.Map;
 
 @Setter
 @Getter
-public class ErrorResponse extends Throwable {
+public class ErrorResponse {
 
 	private int status;
 
