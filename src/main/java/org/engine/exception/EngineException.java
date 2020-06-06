@@ -16,7 +16,7 @@ public class EngineException extends BaseException {
     private int httpStatusCode;
 
     public EngineException(final ErrorDetail error) {
-        super(error);
+        super(error, error.getDetail());
         this.detail = error.getDetail();
         this.message = error.getMessage();
         this.httpStatus = error.getHttpStatus();
@@ -27,6 +27,22 @@ public class EngineException extends BaseException {
         super(error, MessageFormat.format(error.getMessage(), args));
         this.detail = error.getDetail();
         this.message = error.getMessage();
+        this.httpStatus = error.getHttpStatus();
+        this.httpStatusCode = error.getHttpStatus().value();
+    }
+
+    public EngineException(final ErrorDetail error, final String detail) {
+        super(error, detail);
+        this.detail = detail;
+        this.message = error.getMessage();
+        this.httpStatus = error.getHttpStatus();
+        this.httpStatusCode = error.getHttpStatus().value();
+    }
+
+    public EngineException(final ErrorDetail error, final String detail, final String message) {
+        super(error, detail);
+        this.detail = detail;
+        this.message = message;
         this.httpStatus = error.getHttpStatus();
         this.httpStatusCode = error.getHttpStatus().value();
     }
