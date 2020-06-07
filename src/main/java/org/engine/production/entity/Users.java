@@ -1,30 +1,40 @@
 package org.engine.production.entity;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Data;
 import org.engine.utils.LocalDateTimeConverter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder(toBuilder = true)
+
+//@Getter // delete
+//@Setter // delete
+//@NoArgsConstructor // delete
+//@AllArgsConstructor // delete
+//@Builder(toBuilder = true) // delete
+@Data
 @Entity
 @Table(name = "users")
 public class Users implements Serializable {
+
+    public static final PasswordEncoder PASSWORD_ENCODER = new BCryptPasswordEncoder();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
     private int id;
 
+    //    permit save two user with one login? why not.
     @Column(length = 255)
     private String login;
 
-    @Column(length = 255)
+    @Column(length = 255, unique = true)
+    @Email
     private String email;
 
     @Column(name = "encrypted_password", length = 255)
@@ -37,18 +47,20 @@ public class Users implements Serializable {
     @Column(length = 64)
     private String salt;
 
-    @Column(columnDefinition = "TINYINT", length = 1)
+    @Column(name = "enabled")
     private Boolean enabled;
 
     @Column(name = "failed_attempts", length = 4)
     private Integer failedAttempts;
 
+    //   what this mean? who owner? slave owner?
     @Column(name = "owner_id", length = 4)
     private Integer ownerId;
 
     @Column(name = "owner_type", length = 255)
     private String ownerType;
 
+    //    roles move to new entity
     @Column(length = 25)
     private String role;
 
@@ -61,6 +73,7 @@ public class Users implements Serializable {
     @Column(length = 255)
     private String type;
 
+    //    all data with Local.Date like create_at and etc. move new entity
     @Column(name = "client_cert", length = 512)
     private String clientCert;
 
@@ -108,6 +121,20 @@ public class Users implements Serializable {
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime expiredAt;
 
+    @Column(name = "password")
+    @JsonIgnore
+    private String password;
+
+    public Users() {
+        super();
+        this.enabled=false;
+    }
+
+    public void setPassword(String password) {
+        this.password = PASSWORD_ENCODER.encode(password);
+    }
+
+    //    TODO ? updating process by repository not entity
     public void update(Users newUser) {
         this.login = newUser.getLogin();
         this.email = newUser.getEmail();
