@@ -1,5 +1,6 @@
 package org.engine.security;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.engine.exception.ErrorDetail;
 import org.engine.exception.ErrorResponse;
@@ -39,7 +40,7 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         errorResponse.setErrors(Arrays.asList(errorEntry));
 
         response.setStatus(errorDetail.getHttpStatus().value());
-        String json = new ObjectMapper().writeValueAsString(errorResponse);
+        String json = new ObjectMapper().setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL).writeValueAsString(errorResponse);
         response.getWriter().write(json);
         response.flushBuffer();
     }
