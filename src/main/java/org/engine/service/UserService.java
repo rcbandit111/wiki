@@ -1,6 +1,7 @@
 package org.engine.service;
 
-import org.engine.exception.ValidationException;
+import org.engine.exception.EngineException;
+import org.engine.exception.ErrorDetail;
 import org.engine.production.entity.Users;
 import org.engine.production.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class UserService {
 
     private void validateEmail(final Users users, final String email) {
         if (!users.getEmail().equals(email)) {
-            throw new ValidationException("NAME_AND_EMAIL_MISMATCH");
+            throw new EngineException(ErrorDetail.NOT_FOUND);
         }
     }
 }
