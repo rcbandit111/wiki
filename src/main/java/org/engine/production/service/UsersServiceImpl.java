@@ -82,7 +82,7 @@ public class UsersServiceImpl implements UsersService {
 
     @Override
     public void save(Users entity) {
-
+        dao.save(entity);
     }
 
     @Override

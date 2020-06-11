@@ -66,7 +66,7 @@ public class UsersController {
     private UserService userService;
 
     @Autowired
-    private UserMapper user_mapper;
+    private UserMapper userMapper;
 
     @Autowired
     private PasswordAdminResetHandler resetHandler;
@@ -91,6 +91,7 @@ public class UsersController {
      * */
     /**
      * Endpoint used to send e-mail reset password request.
+     *
      * @param resetUserDTO
      * @return
      */
@@ -114,6 +115,7 @@ public class UsersController {
 
     /**
      * Called when link from reset e-mail is opened
+     *
      * @param resetPasswordTokenDTO
      * @return
      */
@@ -156,6 +158,7 @@ public class UsersController {
 
     /**
      * Called when server sends status 200 for token confirmation and form is submitted
+     *
      * @param resetPasswordDTO
      * @return
      */
@@ -218,6 +221,7 @@ public class UsersController {
 
     /**
      * Called when link from reset e-mail is opened
+     *
      * @param activatePasswordTokenDTO
      * @return
      */
@@ -244,6 +248,7 @@ public class UsersController {
 
     /**
      * This is called from page New Password
+     *
      * @param activatePasswordDTO
      * @return
      */
@@ -284,6 +289,7 @@ public class UsersController {
 
     /**
      * Force user to set new password
+     *
      * @param resetDTO
      * @return
      */
@@ -301,16 +307,14 @@ public class UsersController {
     }
     
     /**
-     * All reposiory related operation
-     * should be in and we shoud user instead of generics
-     * 
-     *  */
-
+     * All repository related operation
+     * should be in and we should user instead of generics
+     */
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
         return usersRepository
                 .findById(id)
-                .map(user_mapper::toNewDTO)
+                .map(userMapper::toNewDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> notFound().build());
     }
@@ -320,7 +324,7 @@ public class UsersController {
         return usersRepository
                 .findById(id)
                 .map(user -> {
-                    user.update(user_mapper.map(dto));
+                    user.update(userMapper.map(dto));
                     usersRepository.save(user);
                     return user;
                 })
@@ -365,25 +369,25 @@ public class UsersController {
             return new ResponseEntity<>("EMAIL_EXISTS", HttpStatus.BAD_REQUEST);
         }
 
-        Users obj = new Users();
-        obj.setLogin(dto.getLogin());
-        obj.setEmail(dto.getEmail());
-        obj.setFirstName(dto.getFirstName());
-        obj.setLastName(dto.getLastName());
-        obj.setRole(dto.getRole());
-        obj.setType("AdminUser");
-        obj.setEnabled(dto.getEnabled());
-        obj.setCreatedAt(LocalDateTime.now());
+        Users user = new Users();
+        user.setLogin(dto.getLogin());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setRole(dto.getRole());
+        user.setType("AdminUser");
+        user.setEnabled(dto.getEnabled());
+        user.setCreatedAt(LocalDateTime.now());
 
-        usersRepository.save(obj);
+        usersRepository.save(user);
 
-        resetHandler.sendConfirmMail(obj);
+        resetHandler.sendConfirmMail(user);
 
         return ok().build();
     }
 
     @GetMapping("pages")
     public Page<UserDTO> pages(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
-        return usersRepository.findAll(page, size).map(user_mapper::toDTO);
+        return usersRepository.findAll(page, size).map(userMapper::toDTO);
     }
 }

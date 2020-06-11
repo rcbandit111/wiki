@@ -19,6 +19,7 @@ public class EMailSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(EMailSender.class);
 
+    @Autowired
     private JavaMailSender mailSender;
 
     @Value("${app.email.sending-enabled}")
@@ -26,11 +27,6 @@ public class EMailSender {
     
     @Autowired
     private Configuration freemarkerConfig;
-
-    @Autowired
-    public EMailSender(JavaMailSender mailSender) {
-        this.mailSender = mailSender;
-    }
 
     public void sendMail(String to, String subject, EmailModel content) {
         validateSendingParams(to, subject, content);
