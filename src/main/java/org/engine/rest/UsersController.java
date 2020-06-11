@@ -66,7 +66,7 @@ public class UsersController {
     private UserService userService;
 
     @Autowired
-    private UserMapper user_mapper;
+    private UserMapper userMapper;
 
     @Autowired
     private PasswordAdminResetHandler resetHandler;
@@ -83,14 +83,11 @@ public class UsersController {
     @Autowired
     private ValidationMessage validationMessage;
 
-   
-    /**
-     * Reset password page
-     * Step 1 - from login page user enters e-mail to send new password
-     * 
-     * */
+    // Step 1 - from reset login page user enters e-mail to send new password
+
     /**
      * Endpoint used to send e-mail reset password request.
+     *
      * @param resetUserDTO
      * @return
      */
@@ -114,6 +111,7 @@ public class UsersController {
 
     /**
      * Called when link from reset e-mail is opened
+     *
      * @param resetPasswordTokenDTO
      * @return
      */
@@ -129,13 +127,12 @@ public class UsersController {
         return usersRepository.findByResetPasswordToken(resetPasswordTokenDTO.getResetPasswordToken()).map(user -> {
 
             // We have a window of 24 hours to open the reset link from e-mail. If it's old return not found
-            //long hours = ChronoUnit.HOURS.between(user.getConfirmationSentAt(), LocalDateTime.now());
 
             // Logic implemented to get the logged in user and fetch data accordingly
             
-            Users loggedinUser = GenericUtils.getLoggedInUser();
+            Users loggedInUser = GenericUtils.getLoggedInUser();
             
-            long hours = ChronoUnit.HOURS.between(loggedinUser.getConfirmationSentAt(), LocalDateTime.now());
+            long hours = ChronoUnit.HOURS.between(loggedInUser.getConfirmationSentAt(), LocalDateTime.now());
 
             if(hours <= 24)
             {
@@ -156,6 +153,7 @@ public class UsersController {
 
     /**
      * Called when server sends status 200 for token confirmation and form is submitted
+     *
      * @param resetPasswordDTO
      * @return
      */
@@ -163,10 +161,10 @@ public class UsersController {
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
 
         // TODO - think how to get the name - we delete ResetPasswordToken from DB in step 2
-    	Users loggedinUser = GenericUtils.getLoggedInUser();
+    	Users loggedInUser = GenericUtils.getLoggedInUser();
     	/**
     	 * Repository operation should be in service layer
-    	 * Users loggedinUser = GenericUtils.getLoggedInUser();
+    	 * Users loggedInUser = GenericUtils.getLoggedInUser();
     	 * 
     	 * Simply get the logged in user and pass the users instance into service layer and 
     	 * perform the operation there
@@ -218,6 +216,7 @@ public class UsersController {
 
     /**
      * Called when link from reset e-mail is opened
+     *
      * @param activatePasswordTokenDTO
      * @return
      */
@@ -244,6 +243,7 @@ public class UsersController {
 
     /**
      * This is called from page New Password
+     *
      * @param activatePasswordDTO
      * @return
      */
@@ -284,6 +284,7 @@ public class UsersController {
 
     /**
      * Force user to set new password
+     *
      * @param resetDTO
      * @return
      */
@@ -301,26 +302,33 @@ public class UsersController {
     }
     
     /**
-     * All reposiory related operation
-     * should be in and we shoud user instead of generics
-     * 
-     *  */
-
+     * Get user by Id
+     *
+     * @param id
+     * @return Users
+     */
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
         return usersRepository
                 .findById(id)
-                .map(user_mapper::toNewDTO)
+                .map(userMapper::toNewDTO)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> notFound().build());
     }
 
+    /**
+     * Edit User
+     *
+     * @param id
+     * @param dto
+     * @return
+     */
     @PostMapping("{id}")
     public ResponseEntity<?> save(@PathVariable Integer id, @RequestBody UserNewDTO dto) {
         return usersRepository
                 .findById(id)
                 .map(user -> {
-                    user.update(user_mapper.map(dto));
+                    user.update(userMapper.map(dto));
                     usersRepository.save(user);
                     return user;
                 })
@@ -328,10 +336,10 @@ public class UsersController {
     }
 
     /**
-     * This is not a typical rest end point
-     * Need to improve this with ResponseEntity<Object>
-     * And after performing operation return accordingly
-     * */
+     * Search User by params
+     *
+     * @param specification
+     */
     @GetMapping("find")
     public Page<UserNewDTO> getAllBySpecification(
             @And({
@@ -356,6 +364,12 @@ public class UsersController {
                 );
     }
 
+    /**
+     * Create new User
+     *
+     * @param dto
+     * @return
+     */
     @PostMapping("create")
     public ResponseEntity<?> create(@RequestBody UserNewDTO dto) {
         if(usersRepository.findByLogin(dto.getLogin()).isPresent()) {
@@ -365,25 +379,32 @@ public class UsersController {
             return new ResponseEntity<>("EMAIL_EXISTS", HttpStatus.BAD_REQUEST);
         }
 
-        Users obj = new Users();
-        obj.setLogin(dto.getLogin());
-        obj.setEmail(dto.getEmail());
-        obj.setFirstName(dto.getFirstName());
-        obj.setLastName(dto.getLastName());
-        obj.setRole(dto.getRole());
-        obj.setType("AdminUser");
-        obj.setEnabled(dto.getEnabled());
-        obj.setCreatedAt(LocalDateTime.now());
+        Users user = new Users();
+        user.setLogin(dto.getLogin());
+        user.setEmail(dto.getEmail());
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user.setRole(dto.getRole());
+        user.setType("AdminUser");
+        user.setEnabled(dto.getEnabled());
+        user.setCreatedAt(LocalDateTime.now());
 
-        usersRepository.save(obj);
+        usersRepository.save(user);
 
-        resetHandler.sendConfirmMail(obj);
+        resetHandler.sendConfirmMail(user);
 
         return ok().build();
     }
 
+    /**
+     * List users by pages
+     *
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("pages")
     public Page<UserDTO> pages(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
-        return usersRepository.findAll(page, size).map(user_mapper::toDTO);
+        return usersRepository.findAll(page, size).map(userMapper::toDTO);
     }
 }
