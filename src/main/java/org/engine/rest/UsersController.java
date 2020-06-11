@@ -83,12 +83,8 @@ public class UsersController {
     @Autowired
     private ValidationMessage validationMessage;
 
-   
-    /**
-     * Reset password page
-     * Step 1 - from login page user enters e-mail to send new password
-     * 
-     * */
+    // Step 1 - from reset login page user enters e-mail to send new password
+
     /**
      * Endpoint used to send e-mail reset password request.
      *
@@ -131,13 +127,12 @@ public class UsersController {
         return usersRepository.findByResetPasswordToken(resetPasswordTokenDTO.getResetPasswordToken()).map(user -> {
 
             // We have a window of 24 hours to open the reset link from e-mail. If it's old return not found
-            //long hours = ChronoUnit.HOURS.between(user.getConfirmationSentAt(), LocalDateTime.now());
 
             // Logic implemented to get the logged in user and fetch data accordingly
             
-            Users loggedinUser = GenericUtils.getLoggedInUser();
+            Users loggedInUser = GenericUtils.getLoggedInUser();
             
-            long hours = ChronoUnit.HOURS.between(loggedinUser.getConfirmationSentAt(), LocalDateTime.now());
+            long hours = ChronoUnit.HOURS.between(loggedInUser.getConfirmationSentAt(), LocalDateTime.now());
 
             if(hours <= 24)
             {
@@ -166,10 +161,10 @@ public class UsersController {
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
 
         // TODO - think how to get the name - we delete ResetPasswordToken from DB in step 2
-    	Users loggedinUser = GenericUtils.getLoggedInUser();
+    	Users loggedInUser = GenericUtils.getLoggedInUser();
     	/**
     	 * Repository operation should be in service layer
-    	 * Users loggedinUser = GenericUtils.getLoggedInUser();
+    	 * Users loggedInUser = GenericUtils.getLoggedInUser();
     	 * 
     	 * Simply get the logged in user and pass the users instance into service layer and 
     	 * perform the operation there
@@ -307,8 +302,10 @@ public class UsersController {
     }
     
     /**
-     * All repository related operation
-     * should be in and we should user instead of generics
+     * Get user by Id
+     *
+     * @param id
+     * @return Users
      */
     @GetMapping("{id}")
     public ResponseEntity<?> get(@PathVariable Integer id) {
@@ -319,6 +316,13 @@ public class UsersController {
                 .orElseGet(() -> notFound().build());
     }
 
+    /**
+     * Edit User
+     *
+     * @param id
+     * @param dto
+     * @return
+     */
     @PostMapping("{id}")
     public ResponseEntity<?> save(@PathVariable Integer id, @RequestBody UserNewDTO dto) {
         return usersRepository
@@ -332,10 +336,10 @@ public class UsersController {
     }
 
     /**
-     * This is not a typical rest end point
-     * Need to improve this with ResponseEntity<Object>
-     * And after performing operation return accordingly
-     * */
+     * Search User by params
+     *
+     * @param specification
+     */
     @GetMapping("find")
     public Page<UserNewDTO> getAllBySpecification(
             @And({
@@ -360,6 +364,12 @@ public class UsersController {
                 );
     }
 
+    /**
+     * Create new User
+     *
+     * @param dto
+     * @return
+     */
     @PostMapping("create")
     public ResponseEntity<?> create(@RequestBody UserNewDTO dto) {
         if(usersRepository.findByLogin(dto.getLogin()).isPresent()) {
@@ -386,6 +396,13 @@ public class UsersController {
         return ok().build();
     }
 
+    /**
+     * List users by pages
+     *
+     * @param page
+     * @param size
+     * @return
+     */
     @GetMapping("pages")
     public Page<UserDTO> pages(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
         return usersRepository.findAll(page, size).map(userMapper::toDTO);
