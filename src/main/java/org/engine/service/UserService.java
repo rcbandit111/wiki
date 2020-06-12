@@ -4,10 +4,17 @@ import org.engine.exception.EngineException;
 import org.engine.exception.ErrorDetail;
 import org.engine.production.entity.Users;
 import org.engine.production.service.UsersService;
+import org.engine.security.JwtTokenProvider;
+import org.engine.security.Role;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.function.Function;
 
 @Component
@@ -15,11 +22,31 @@ public class UserService {
 
     private final UsersService userService;
     private final PasswordAdminResetHandler resetHandler;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserService(final UsersService userService, final PasswordAdminResetHandler resetHandler) {
+    public UserService(final UsersService userService, final PasswordAdminResetHandler resetHandler,
+                       final AuthenticationManager authenticationManager, final JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.resetHandler = resetHandler;
+        this.authenticationManager = authenticationManager;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
+    public String authorize(String username, String password) {
+        try {
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            // TODO... Think how to implement the user role
+            return jwtTokenProvider.createToken(username, Collections.singletonList(Role.ROLE_ADMIN));
+        } catch (AuthenticationException e) {
+            throw new EngineException(ErrorDetail.NOT_FOUND);
+        }
+    }
+
+    public String refresh(String username) {
+        // TODO... Think how to implement the user role
+        return jwtTokenProvider.createToken(username, Collections.singletonList(Role.ROLE_ADMIN));
     }
 
     public boolean resetRequest(final String login, final String email){

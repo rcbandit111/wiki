@@ -37,11 +37,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
         // Entry points
         http.authorizeRequests()
+            .antMatchers("/users/authorize").permitAll()
             .antMatchers("/users/reset_request").permitAll()
             .antMatchers("/users/reset_token").permitAll()
             .antMatchers("/users/reset_password").permitAll()
             .antMatchers("/users/confirmation_token").permitAll()
-            .antMatchers("/users/reset_user_password").permitAll()
             .antMatchers("/users/reset_user_password").permitAll()
             // Disallow everything else..
             .anyRequest().authenticated();
@@ -69,10 +69,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
       return new BCryptPasswordEncoder(12);
     }
 
-    //  @Override
-    //  @Bean
-    //  public AuthenticationManager authenticationManagerBean() throws Exception {
-    //    return super.authenticationManagerBean();
-    //  }
+    @Bean
+    @Override
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
+    }
 
 }

@@ -8,6 +8,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.engine.dto.ActivatePasswordDTO;
@@ -82,6 +83,29 @@ public class UsersController {
     
     @Autowired
     private ValidationMessage validationMessage;
+
+    /**
+     * User authentication endpoint used by login form
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    @PostMapping("/authorize")
+    public String login(@RequestParam String username, @RequestParam String password) {
+        return userService.authorize(username, password);
+    }
+
+    /**
+     * Refresh JWT token
+     *
+     * @param req
+     * @return
+     */
+    @GetMapping("/refresh")
+    public String refresh(HttpServletRequest req) {
+        return userService.refresh(req.getRemoteUser());
+    }
 
     // Step 1 - from reset login page user enters e-mail to send new password
 
