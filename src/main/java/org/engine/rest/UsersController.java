@@ -30,6 +30,7 @@ import org.engine.service.PasswordAdminResetHandler;
 import org.engine.service.UserService;
 import org.engine.utils.GenericUtils;
 import org.engine.utils.ResponseHandler;
+import org.engine.utils.Role;
 import org.engine.utils.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -381,7 +383,7 @@ public class UsersController {
                         .firstName(g.getFirstName())
                         .lastName(g.getLastName())
                         .email(g.getEmail())
-                        .role(g.getRole())
+                        .role(g.getRole().getAuthority())
                         .enabled(g.getEnabled())
                         .createdAt(g.getCreatedAt())
                         .build()
@@ -408,7 +410,7 @@ public class UsersController {
         user.setEmail(dto.getEmail());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
-        user.setRole(dto.getRole());
+        user.setRole(Role.valueOf(dto.getRole()));
         user.setType("AdminUser");
         user.setEnabled(dto.getEnabled());
         user.setCreatedAt(LocalDateTime.now());
@@ -428,6 +430,7 @@ public class UsersController {
      * @return
      */
     @GetMapping("pages")
+    //@PreAuthorize("hasRole(T(<package name>.Role).ROLE_ADMIN)")
     public Page<UserDTO> pages(@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
         return usersRepository.findAll(page, size).map(userMapper::toDTO);
     }

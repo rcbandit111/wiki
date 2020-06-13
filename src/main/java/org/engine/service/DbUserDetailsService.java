@@ -35,7 +35,7 @@ public class DbUserDetailsService implements UserDetailsService {
                             hasAccountExpired(user.getExpiredAt()),
                             hasPasswordExpired(user.getPasswordChangedAt()),
                             hasAccountLocked(user.getLockedAt()),
-                            Collections.singleton(new SimpleGrantedAuthority(user.getRole()))
+                            Collections.singleton(new SimpleGrantedAuthority(user.getRole().getAuthority()))
                     );
                 }).orElseThrow(() -> new UsernameNotFoundException("User with username " + username + " not found"));
     }
