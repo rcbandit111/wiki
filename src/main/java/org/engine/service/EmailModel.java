@@ -1,7 +1,14 @@
 package org.engine.service;
 
+import lombok.*;
+
 import java.util.Map;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(toBuilder = true)
 public class EmailModel {
 	
 	private String mailFrom;
@@ -13,44 +20,4 @@ public class EmailModel {
 	private String mailContent;
 	
 	private Map<String, Object> model;
-
-	public String getMailFrom() {
-		return mailFrom;
-	}
-
-	public void setMailFrom(String mailFrom) {
-		this.mailFrom = mailFrom;
-	}
-
-	public String getMailTo() {
-		return mailTo;
-	}
-
-	public void setMailTo(String mailTo) {
-		this.mailTo = mailTo;
-	}
-
-	public String getMailSubject() {
-		return mailSubject;
-	}
-
-	public void setMailSubject(String mailSubject) {
-		this.mailSubject = mailSubject;
-	}
-
-	public String getMailContent() {
-		return mailContent;
-	}
-
-	public void setMailContent(String mailContent) {
-		this.mailContent = mailContent;
-	}
-
-	public Map<String, Object> getModel() {
-		return model;
-	}
-
-	public void setModel(Map<String, Object> model) {
-		this.model = model;
-	} 
 }
