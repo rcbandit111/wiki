@@ -204,7 +204,7 @@ public class UsersController {
         {
             return this.usersRepository.findByLogin(resetPasswordDTO.getLogin()).map(user -> {
 
-                Integer userId = user.getId();
+                Long userId = user.getId();
 
                 List<OldPasswords> list = oldPasswordsService.findByOwnerId(userId);
 

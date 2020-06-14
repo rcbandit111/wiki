@@ -35,7 +35,7 @@ public class OldPasswordsServiceImpl implements OldPasswordsService {
     }
 
     @Override
-    public List<OldPasswords> findByOwnerId(Integer ownerId) {
+    public List<OldPasswords> findByOwnerId(Long ownerId) {
         String hql = "select e from " + OldPasswords.class.getName() + " e where e.passwordOwnerId = :passwordOwnerId ORDER BY e.createdAt DESC";
         TypedQuery<OldPasswords> query = entityManager.createQuery(hql, OldPasswords.class).setMaxResults(3).setParameter("passwordOwnerId", ownerId);
         List<OldPasswords> list = query.getResultList();

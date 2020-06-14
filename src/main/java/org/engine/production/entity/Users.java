@@ -20,7 +20,7 @@ public class Users implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(length = 255)
     private String login;

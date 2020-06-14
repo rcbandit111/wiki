@@ -19,7 +19,7 @@ public class Sessions implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "session_id", length = 255)
     private String sessionId;
