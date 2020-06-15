@@ -3,10 +3,13 @@ package org.engine.production.entity;
 import lombok.*;
 import org.engine.utils.LocalDateTimeConverter;
 import org.engine.utils.Role;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Collection;
 
 @Getter
 @Setter
@@ -15,7 +18,7 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "users")
-public class Users implements Serializable {
+public class Users implements UserDetails, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -119,5 +122,40 @@ public class Users implements Serializable {
         this.enabled = newUser.getEnabled();
         this.updatedAt = LocalDateTime.now();
         this.ownerId = newUser.getOwnerId();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getPassword() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return null;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return false;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return false;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return false;
     }
 }

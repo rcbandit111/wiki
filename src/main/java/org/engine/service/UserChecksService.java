@@ -1,11 +1,7 @@
 package org.engine.service;
 
-import com.security.oauth.model.User;
-import com.security.oauth.repository.UserRepository;
-import org.engine.production.service.UsersRepository;
 import org.engine.production.service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
