@@ -8,8 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -126,36 +128,36 @@ public class Users implements UserDetails, Serializable {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        return Collections.singleton(role);
     }
 
     @Override
     public String getPassword() {
-        return null;
+        return encryptedPassword;
     }
 
     @Override
     public String getUsername() {
-        return null;
+        return login;
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return Duration.between(passwordChangedAt, LocalDateTime.now()).toDays() <= 45;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return lockedAt == null;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return expiredAt == null;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return enabled;
     }
 }
