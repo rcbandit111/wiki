@@ -79,5 +79,7 @@ public class UserService {
         if (!users.getEmail().equals(email)) {
             throw new EngineException(ErrorDetail.NOT_FOUND);
         }
+
     }
+    // user update for rest api
 }
