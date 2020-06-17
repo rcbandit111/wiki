@@ -128,6 +128,7 @@ public class UsersController {
 			return ResponseHandler.generateValidationResponse(HttpStatus.BAD_REQUEST, false,
 					validationMessage.getFieldErrorResponse(bindResult));
 		}
+
         return userService.resetRequest(resetUserDTO.getName(), resetUserDTO.getEmail()) ?
                 ok(resetUserDTO) :
                 notFound().build();

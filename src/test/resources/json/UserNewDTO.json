@@ -1,0 +1,13 @@
+{
+  "id": 1,
+  "login": "login",
+  "firstName": "firstName",
+  "lastName": "lastName",
+  "email": "email",
+  "role": "ROLE_ADMIN",
+  "enabled": "true",
+  "ownerId": "1",
+  "ownerType": "ownerType",
+  "lastActivityAt": "2020-05-14T17:45:55.9483536",
+  "createdAt": "2019-07-14T17:45:55.9483536"
+}
