@@ -1,4 +1,4 @@
-package java.org.engine.rest;
+package org.engine.rest;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -16,7 +16,7 @@ import org.engine.production.service.UsersService;
 import org.engine.rest.UsersController;
 import org.engine.security.JwtTokenUtil;
 import org.engine.service.PasswordAdminResetHandler;
-import org.engine.service.UserService;
+import org.engine.service.UserRestService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -88,13 +88,13 @@ public class UsersControllerTest {
     private MockMvc mockMvc;
 
     @Spy
-    public UserService userCService;
+    public UserRestService userRestService;
 
     @InjectMocks
     private UsersController controller;
 
     @Spy
-    private UserMapper user_mapper;
+    private UserMapper userMapper;
 
     @Spy
     private PasswordEncoder passwordEncoder;
@@ -185,7 +185,7 @@ public class UsersControllerTest {
 
     @Test
     public void resetRequest_NAME_AND_EMAIL_MISMATCH() throws Exception {
-        when(userCService.resetRequest(anyString(), anyString())).thenReturn(Boolean.valueOf("test"));
+        when(userRestService.resetRequest(anyString(), anyString())).thenReturn(Boolean.valueOf("test"));
 
         MvcResult result = mockMvc.perform(post("/users/reset_request")
                 .contentType(MediaType.APPLICATION_JSON)

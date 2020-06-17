@@ -1,4 +1,4 @@
-package java.org.engine.poc;
+package org.engine.poc;
 
 import org.junit.jupiter.api.Test;
 

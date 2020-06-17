@@ -1,5 +1,7 @@
 package org.engine.service;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.engine.exception.EngineException;
 import org.engine.exception.ErrorDetail;
 import org.engine.production.entity.Users;
@@ -18,7 +20,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 @Component
-public class UserService {
+public class UserRestService {
 
     private final UsersService userService;
     private final PasswordAdminResetHandler resetHandler;
@@ -26,8 +28,8 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public UserService(final UsersService userService, final PasswordAdminResetHandler resetHandler,
-                       final AuthenticationManager authenticationManager, final JwtTokenProvider jwtTokenProvider) {
+    public UserRestService(final UsersService userService, final PasswordAdminResetHandler resetHandler,
+                           final AuthenticationManager authenticationManager, final JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.resetHandler = resetHandler;
         this.authenticationManager = authenticationManager;
