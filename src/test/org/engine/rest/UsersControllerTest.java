@@ -196,6 +196,8 @@ public class UsersControllerTest {
     public void resetTokenTest_OK() throws Exception {
         when(userService.findByResetPasswordToken(anyString())).thenReturn(trueOptional);
 
+        when(userService.findByResetPasswordToken(anyString())).thenReturn(Optional.of(new Users()));
+
         mockMvc.perform(post("/users/reset_token")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(ResetPasswordTokenDTO))

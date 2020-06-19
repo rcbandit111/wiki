@@ -17,7 +17,7 @@ public class ResetPasswordTokenDTO {
 
     @NotNull
     @NotEmpty
-    @Size(min=254, max=255, message = "'Reset Password Token' value '${validatedValue}' must be between {min} and {max} characters long.")
+    @Size(min=200, max=255, message = "'Reset Password Token' value '${validatedValue}' must be between {min} and {max} characters long.")
     private String resetPasswordToken;
 
     // Server Response data
