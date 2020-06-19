@@ -55,7 +55,8 @@ public class UsersControllerTest {
     }
 
     @Mock
-    public UsersService userService;
+    public UsersService usersService;
+
     private MockMvc mockMvc;
 
     @Mock
@@ -114,7 +115,7 @@ public class UsersControllerTest {
     public void createTest_USER_EXISTS() throws Exception {
 
         System.out.println("createTest_USER_EXISTS");
-        when(userService.findByLogin(any(String.class))).thenReturn(trueOptional);
+        when(usersService.findByLogin(any(String.class))).thenReturn(trueOptional);
 
         MvcResult result = mockMvc.perform(post("/users/create")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +131,7 @@ public class UsersControllerTest {
     public void createTest_EMAIL_EXISTS() throws Exception {
 
         System.out.println("createTest_EMAIL_EXISTS");
-        when(userService.findByEmail(any(String.class))).thenReturn(trueOptional);
+        when(usersService.findByEmail(any(String.class))).thenReturn(trueOptional);
 
         MvcResult result = mockMvc.perform(post("/users/create")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -144,8 +145,8 @@ public class UsersControllerTest {
 
     @Test
     public void createTest_OK() throws Exception {
-        when(userService.findByEmail(any(String.class))).thenReturn(Optional.empty());
-        when(userService.findByLogin(any(String.class))).thenReturn(Optional.empty());
+        when(usersService.findByEmail(any(String.class))).thenReturn(Optional.empty());
+        when(usersService.findByLogin(any(String.class))).thenReturn(Optional.empty());
 
         // TODO.. we need to test also with wrong role type
         mockMvc.perform(post("/users/create")
@@ -169,7 +170,7 @@ public class UsersControllerTest {
 
     @Test
     public void resetRequest_OK() throws Exception {
-        when(userService.findByLogin(anyString())).thenReturn(trueOptional);
+        when(usersService.findByLogin(anyString())).thenReturn(trueOptional);
 
         mockMvc.perform(post("/users/reset_request")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -184,7 +185,7 @@ public class UsersControllerTest {
 
     @Test
     public void resetRequest_NOT_FOUND() throws Exception {
-        when(userService.findByLogin(anyString())).thenReturn(Optional.empty());
+        when(usersService.findByLogin(anyString())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/users/reset_request")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -194,9 +195,9 @@ public class UsersControllerTest {
 
     @Test
     public void resetTokenTest_OK() throws Exception {
-        when(userService.findByResetPasswordToken(anyString())).thenReturn(trueOptional);
+        when(usersService.findByResetPasswordToken(anyString())).thenReturn(trueOptional);
 
-        when(userService.findByResetPasswordToken(anyString())).thenReturn(Optional.of(new Users()));
+        when(usersService.findByResetPasswordToken(anyString())).thenReturn(Optional.of(new Users()));
 
         mockMvc.perform(post("/users/reset_token")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -211,7 +212,7 @@ public class UsersControllerTest {
 
     @Test
     public void resetTokenTest_24_HOURS_PASSED() throws Exception {
-        when(userService.findByResetPasswordToken(anyString())).thenReturn(falseTime);
+        when(usersService.findByResetPasswordToken(anyString())).thenReturn(falseTime);
 
         mockMvc.perform(post("/users/reset_token")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -221,7 +222,7 @@ public class UsersControllerTest {
 
     @Test
     public void resetTokenTest_NOT_FOUND() throws Exception {
-        when(userService.findByResetPasswordToken(anyString())).thenReturn(Optional.empty());
+        when(usersService.findByResetPasswordToken(anyString())).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/users/reset_token")
                 .contentType(MediaType.APPLICATION_JSON)
