@@ -5,6 +5,7 @@ import org.engine.mapper.UserMapper;
 import org.engine.production.entity.Users;
 import org.engine.production.service.OldPasswordsService;
 import org.engine.production.service.UsersService;
+import org.engine.security.JwtTokenProvider;
 import org.engine.security.JwtTokenUtil;
 import org.engine.service.PasswordAdminResetHandler;
 import org.engine.service.UserRestService;
@@ -12,7 +13,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -55,6 +58,9 @@ public class UsersControllerTest {
     }
 
     @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Mock
     public UsersService usersService;
 
     private MockMvc mockMvc;
@@ -92,6 +98,8 @@ public class UsersControllerTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
+        Mockito.mock(JwtTokenProvider.class);
 
         user = new Users();
         user.setEmail("email");
@@ -223,8 +231,6 @@ public class UsersControllerTest {
                 .content(ResetPasswordTokenDTO))
                 .andExpect(status().isNotFound());
     }
-
-    // TODO.. JWT token utils are failing, token cannot e extracted
 
     @Test
     public void resetTokenTest_NOT_FOUND() throws Exception {
