@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -24,6 +25,7 @@ import org.engine.production.service.OldPasswordsService;
 import org.engine.production.service.UsersService;
 import org.engine.rest.dto.UserDTO;
 import org.engine.rest.dto.UserNewDTO;
+import org.engine.security.JwtTokenProvider;
 import org.engine.security.JwtTokenUtil;
 import org.engine.security.JwtUser;
 import org.engine.service.PasswordAdminResetHandler;
@@ -60,6 +62,9 @@ import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
 public class UsersController {
 
     private static final Logger LOG = LoggerFactory.getLogger(UsersController.class);
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private UsersService usersService;
@@ -149,22 +154,24 @@ public class UsersController {
 			return ResponseHandler.generateValidationResponse(HttpStatus.BAD_REQUEST, false,
 					validationMessage.getFieldErrorResponse(bindResult));
 		}
-    	
+
+        final String login = jwtTokenProvider.getUsername(resetPasswordTokenDTO.getResetPasswordToken());
+
         return usersService.findByResetPasswordToken(resetPasswordTokenDTO.getResetPasswordToken()).map(user -> {
 
             // We have a window of 24 hours to open the reset link from e-mail. If it's old return not found
 
             // Logic implemented to get the logged in user and fetch data accordingly
-            
-            Users loggedInUser = GenericUtils.getLoggedInUser();
-            
-            long hours = ChronoUnit.HOURS.between(loggedInUser.getConfirmationSentAt(), LocalDateTime.now());
+
+            Optional<Users> byLogin = usersService.findByLogin(login);
+            Users users = byLogin.get();
+
+            long hours = ChronoUnit.HOURS.between(users.getConfirmationSentAt(), LocalDateTime.now());
 
             if(hours <= 24)
             {
                 user.setResetPasswordToken(null);
                 resetPasswordTokenDTO.setStatus(HttpStatus.OK.value()); // Return status 200
-                resetPasswordTokenDTO.setLogin(user.getLogin());
                 //This code should be in service layer and handle the exception there
                 usersService.save(user);
 
@@ -196,13 +203,15 @@ public class UsersController {
     	 * perform the operation there
     	 * */
 
-        if(!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(resetPasswordDTO.getLogin())))
+        final String login = jwtTokenProvider.getUsername(resetPasswordDTO.getResetPasswordToken());
+
+        if(!jwtTokenUtil.validateToken(resetPasswordDTO.getResetPasswordToken(), new JwtUser(login)))
         {
             return new ResponseEntity<>("INVALID_TOKEN", HttpStatus.BAD_REQUEST);
         }
         else
         {
-            return this.usersService.findByLogin(resetPasswordDTO.getLogin()).map(user -> {
+            return this.usersService.findByLogin(login).map(user -> {
 
                 Integer userId = user.getId();
 
