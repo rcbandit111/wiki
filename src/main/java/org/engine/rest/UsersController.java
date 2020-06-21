@@ -164,18 +164,21 @@ public class UsersController {
             // Logic implemented to get the logged in user and fetch data accordingly
 
             Optional<Users> byLogin = usersService.findByLogin(login);
-            Users users = byLogin.get();
-
-            long hours = ChronoUnit.HOURS.between(users.getConfirmationSentAt(), LocalDateTime.now());
-
-            if(hours <= 24)
+            if(byLogin.isPresent())
             {
-                user.setResetPasswordToken(null);
-                resetPasswordTokenDTO.setStatus(HttpStatus.OK.value()); // Return status 200
-                //This code should be in service layer and handle the exception there
-                usersService.save(user);
+                Users users = byLogin.get();
 
-                return ok(resetPasswordTokenDTO);
+                long hours = ChronoUnit.HOURS.between(users.getConfirmationSentAt(), LocalDateTime.now());
+
+                if(hours <= 24)
+                {
+                    user.setResetPasswordToken(null);
+                    resetPasswordTokenDTO.setStatus(HttpStatus.OK.value()); // Return status 200
+                    //This code should be in service layer and handle the exception there
+                    usersService.save(user);
+
+                    return ok(resetPasswordTokenDTO);
+                }
             }
 
             return notFound().build();
