@@ -3,10 +3,15 @@ package org.engine.production.entity;
 import lombok.*;
 import org.engine.utils.LocalDateTimeConverter;
 import org.engine.utils.Role;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 
 @Getter
 @Setter
@@ -15,12 +20,12 @@ import java.time.LocalDateTime;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "users")
-public class Users implements Serializable {
+public class Users implements UserDetails, Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(length = 255)
     private String login;
@@ -119,5 +124,40 @@ public class Users implements Serializable {
         this.enabled = newUser.getEnabled();
         this.updatedAt = LocalDateTime.now();
         this.ownerId = newUser.getOwnerId();
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singleton(role);
+    }
+
+    @Override
+    public String getPassword() {
+        return encryptedPassword;
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return Duration.between(passwordChangedAt, LocalDateTime.now()).toDays() <= 45;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return lockedAt == null;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return expiredAt == null;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled;
     }
 }

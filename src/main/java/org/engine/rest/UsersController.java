@@ -216,7 +216,7 @@ public class UsersController {
         {
             return this.usersService.findByLogin(login).map(user -> {
 
-                Integer userId = user.getId();
+                Long userId = user.getId();
 
                 List<OldPasswords> list = oldPasswordsService.findByOwnerId(userId);
 

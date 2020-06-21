@@ -12,7 +12,7 @@ public interface OldPasswordsService {
 
     Optional<OldPasswords> findEncryptedPassword(String encryptedPassword);
 
-    List<OldPasswords> findByOwnerId(Integer ownerId);
+    List<OldPasswords> findByOwnerId(Long ownerId);
 
     Optional<OldPasswords> findByName(String name);
 

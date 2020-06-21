@@ -19,7 +19,7 @@ public class OldPasswords implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(name = "encrypted_password", length = 255)
     private String encryptedPassword;
@@ -28,7 +28,7 @@ public class OldPasswords implements Serializable {
     private String passwordOwnerType;
 
     @Column(name = "password_owner_id", length = 4)
-    private Integer passwordOwnerId;
+    private Long passwordOwnerId;
 
     @Column(name = "created_at")
     @Convert(converter = LocalDateTimeConverter.class)

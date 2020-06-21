@@ -2,6 +2,7 @@ package org.engine.warehouse.entity;
 
 import lombok.*;
 import org.engine.utils.LocalDateTimeConverter;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,7 +20,7 @@ public class InvestmentOpportunities implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true, updatable = false, nullable = false)
-    private int id;
+    private Long id;
 
     @Column(length = 255)
     private String name;
@@ -37,6 +38,4 @@ public class InvestmentOpportunities implements Serializable {
     @Column(name = "updated_at")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime updatedAt;
-
-
 }

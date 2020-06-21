@@ -25,7 +25,6 @@ public class InvestmentOpportunitiesServiceImpl implements InvestmentOpportuniti
     @Autowired
     private InvestmentOpportunitiesRepository dao;
 
-
     @Override
     public Optional<InvestmentOpportunities> findByName(String name) {
         return Optional.empty();
