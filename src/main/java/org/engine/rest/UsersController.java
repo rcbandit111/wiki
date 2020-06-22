@@ -93,13 +93,13 @@ public class UsersController {
     /**
      * User authentication endpoint used by login form
      *
-     * @param username
-     * @param password
+     * @param resetDTO
      * @return
      */
     @PostMapping("/authorize")
-    public String login(@RequestParam String username, @RequestParam String password) {
-        return userRestService.authorize(username, password);
+    public String login(@Valid @RequestBody AuthenticationDTO resetDTO) {
+        // TODO... store the password as array for high security
+        return userRestService.authorize(resetDTO.getName(), resetDTO.getPassword());
     }
 
     /**

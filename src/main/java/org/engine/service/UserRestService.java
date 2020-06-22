@@ -38,10 +38,12 @@ public class UserRestService {
 
     public String authorize(String username, String password) {
         try {
+            System.out.println("NO USER FOUND!!!!!!aaaaa");
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
             Optional<Users> user = userService.findByLogin(username);
             if(!user.isPresent()){
+                System.out.println("NO USER FOUND!!!!!!");
                 throw new EngineException(ErrorDetail.NOT_FOUND);
             }
 
