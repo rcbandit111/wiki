@@ -1,13 +1,10 @@
 package org.engine.service;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.engine.exception.EngineException;
 import org.engine.exception.ErrorDetail;
 import org.engine.production.entity.Users;
 import org.engine.production.service.UsersService;
 import org.engine.security.JwtTokenProvider;
-import org.engine.utils.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -38,12 +35,10 @@ public class UserRestService {
 
     public String authorize(String username, String password) {
         try {
-            System.out.println("NO USER FOUND!!!!!!aaaaa");
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
             Optional<Users> user = userService.findByLogin(username);
             if(!user.isPresent()){
-                System.out.println("NO USER FOUND!!!!!!");
                 throw new EngineException(ErrorDetail.NOT_FOUND);
             }
 
