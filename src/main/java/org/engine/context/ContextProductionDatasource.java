@@ -73,6 +73,7 @@ public class ContextProductionDatasource {
 		HashMap<String, Object> properties = new HashMap<>();
 		properties.put("javax.persistence.create-database-schemas", true);
 		properties.put(AvailableSettings.HBM2DDL_AUTO, environment.getProperty("spring.production.datasource.jpa.hibernate.ddl-auto"));
+		properties.put(AvailableSettings.SHOW_SQL, environment.getProperty("spring.production.datasource.jpa.show-sql"));
 		em.setJpaPropertyMap(properties);
 		return em;
 	}
