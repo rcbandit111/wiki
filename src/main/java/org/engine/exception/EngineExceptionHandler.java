@@ -1,6 +1,5 @@
 package org.engine.exception;
 
-import org.engine.rest.UserStoriesController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,7 +15,7 @@ import java.util.Map;
 @ControllerAdvice
 public class EngineExceptionHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UserStoriesController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EngineExceptionHandler.class);
 
 	@ExceptionHandler({ AccessDeniedException.class })
 	public ResponseEntity<ErrorResponseDTO> accessDeniedExceptionHandler(final AccessDeniedException ex) {

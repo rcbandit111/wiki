@@ -68,7 +68,7 @@ spring:
                         dialect: org.hibernate.dialect.MariaDBDialect
                 show-sql: true
             password: qwerty
-            username: root    
+            username: wildfly
     warehouse:
         datasource:
             driver-class-name: org.mariadb.jdbc.Driver
@@ -81,4 +81,4 @@ spring:
                         dialect: org.hibernate.dialect.MariaDBDialect
                 show-sql: true
             password: qwerty
-            username: root
+            username: wildfly
