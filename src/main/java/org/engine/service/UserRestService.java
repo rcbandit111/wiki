@@ -7,6 +7,9 @@ import org.engine.production.service.UsersService;
 import org.engine.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CredentialsExpiredException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
@@ -43,8 +46,14 @@ public class UserRestService {
             }
 
             return jwtTokenProvider.createToken(username, Collections.singletonList(user.get().getRole()));
-        } catch (AuthenticationException e) {
-            throw new EngineException(ErrorDetail.NOT_FOUND);
+        } catch (BadCredentialsException ex){
+            throw new EngineException(ErrorDetail.BAD_CREDENTIALS);
+        } catch (CredentialsExpiredException ex){
+            throw new EngineException(ErrorDetail.EXPIRED_CREDENTIALS);
+        } catch (DisabledException ex) {
+            throw new EngineException(ErrorDetail.DISABLED_USER);
+        } catch (AuthenticationException ex) {
+            throw new EngineException(ErrorDetail.AUTHENTICATION_ERROR);
         }
     }
 

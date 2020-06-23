@@ -6,8 +6,12 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorDetail implements ErrorInfo {
 
-	NOT_FOUND("1000", "Message not found", "Detail not found", "Title not found", HttpStatus.NOT_FOUND),
-	TEMPLATE_NOT_FOUND("1001", "Template not found", "Internal Error", "Internal Error", HttpStatus.NOT_FOUND);
+	NOT_FOUND("1000", "Not found", "Not found", "Not found", HttpStatus.NOT_FOUND),
+	BAD_CREDENTIALS("1000", "Bad Credentials", "Bad Credentials", "Bad Credentials", HttpStatus.NOT_FOUND),
+	EXPIRED_CREDENTIALS("1000", "Expired Credentials", "Expired Credentials", "Expired Credentials", HttpStatus.NOT_FOUND),
+	DISABLED_USER("1000", "Disabled user", "Disabled user", "Disabled user", HttpStatus.NOT_FOUND),
+	AUTHENTICATION_ERROR("1000", "Authentication error", "Authentication error", "Authentication error", HttpStatus.NOT_FOUND),
+	TEMPLATE_NOT_FOUND("1000", "Template not found", "Internal Error", "Internal Error", HttpStatus.NOT_FOUND);
 
 	private String errorCode;
 	private String message;
