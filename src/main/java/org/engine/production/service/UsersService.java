@@ -26,6 +26,8 @@ public interface UsersService {
 
     public Iterable<Users> findAll(List<Integer> ids);
 
+    Users update(Users entity);
+
     void save(Users entity);
 
     public Page<Users> findAll(int page, int size);

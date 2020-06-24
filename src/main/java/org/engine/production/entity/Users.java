@@ -109,15 +109,4 @@ public class Users implements Serializable {
     @Column(name = "expired_at")
     @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime expiredAt;
-
-    public void update(Users newUser) {
-        this.login = newUser.getLogin();
-        this.email = newUser.getEmail();
-        this.firstName = newUser.getFirstName();
-        this.lastName = newUser.getLastName();
-        this.role = newUser.getRole();
-        this.enabled = newUser.getEnabled();
-        this.updatedAt = LocalDateTime.now();
-        this.ownerId = newUser.getOwnerId();
-    }
 }

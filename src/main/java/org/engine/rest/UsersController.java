@@ -366,8 +366,7 @@ public class UsersController {
         return usersService
                 .findById(id)
                 .map(user -> {
-                    user.update(userMapper.map(dto));
-                    usersService.save(user);
+                    usersService.update(userMapper.map(dto));
                     return user;
                 })
                 .map(ResponseEntity::ok).orElseGet(() -> notFound().build());

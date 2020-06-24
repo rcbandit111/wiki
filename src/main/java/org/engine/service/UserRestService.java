@@ -36,6 +36,12 @@ public class UserRestService {
         this.jwtTokenProvider = jwtTokenProvider;
     }
 
+    /**
+     *
+     * @param username
+     * @param password
+     * @return
+     */
     public String authorize(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
@@ -57,6 +63,11 @@ public class UserRestService {
         }
     }
 
+    /**
+     *
+     * @param username
+     * @return
+     */
     public String refresh(String username) {
 
         Optional<Users> user = userService.findByLogin(username);
@@ -67,12 +78,23 @@ public class UserRestService {
         return jwtTokenProvider.createToken(username, Collections.singletonList(user.get().getRole()));
     }
 
+    /**
+     *
+     * @param login
+     * @param email
+     * @return
+     */
     public boolean resetRequest(final String login, final String email){
         return userService.findByLogin(login)
                 .map(resetUserPassword(email))
                 .orElse(false);
     }
 
+    /**
+     *
+     * @param email
+     * @return
+     */
     private Function<Users, Boolean> resetUserPassword(String email) {
         return user -> {
             validateEmail(user, email);
@@ -83,6 +105,11 @@ public class UserRestService {
         };
     }
 
+    /**
+     *
+     * @param users
+     * @param email
+     */
     private void validateEmail(final Users users, final String email) {
         if (!users.getEmail().equals(email)) {
             throw new EngineException(ErrorDetail.NOT_FOUND);
