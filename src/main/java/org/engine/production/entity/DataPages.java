@@ -25,6 +25,9 @@ public class DataPages implements Serializable {
     @Column(name = "CONTENT", columnDefinition = "TEXT", length = 65535)
     private String content;
 
+    @Column(length = 255)
+    private String type;
+
     @Column(name = "created_by", length = 4)
     private Integer createdBy;
 

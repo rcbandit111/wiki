@@ -5,8 +5,8 @@ logging:
         com:
             backend: DEBUG
         org:
-            springframework: INFO
-            springframework.web: ERROR
+            springframework: DEBUG
+            springframework.web: DEBUG
 app:
     admin:
         confirm-url: /admin/auth/password?token=
