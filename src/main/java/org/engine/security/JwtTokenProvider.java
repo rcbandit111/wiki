@@ -63,17 +63,16 @@ public class JwtTokenProvider {
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
 
-        String role = roles.stream()
+        List<String> authorities = roles.stream()
                 .filter(Objects::nonNull)
-                .map(s -> s.getAuthority().toString())
-                .collect(Collectors.toList())
-                .toString();
+                .map(s -> s.getAuthority())
+                .collect(Collectors.toList());
 
         // https://tools.ietf.org/html/rfc6749#section-5.1
         AuthenticationTokenDTO tokenDTO = AuthenticationTokenDTO.builder()
                 .accessToken(token)
                 .tokenType("Bearer")
-                .role(role)
+                .role(authorities)
                 .expiresIn(validityInMilliseconds)
                 .build();
 
