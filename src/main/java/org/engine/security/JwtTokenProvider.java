@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class JwtTokenProvider {
@@ -61,11 +62,19 @@ public class JwtTokenProvider {
                 .setExpiration(validity)
                 .signWith(SignatureAlgorithm.HS512, secretKey)
                 .compact();
+
+        String role = roles.stream()
+                .filter(Objects::nonNull)
+                .map(s -> s.getAuthority().toString())
+                .collect(Collectors.toList())
+                .toString();
+
         // https://tools.ietf.org/html/rfc6749#section-5.1
         AuthenticationTokenDTO tokenDTO = AuthenticationTokenDTO.builder()
-                .access_token(token)
-                .token_type("Bearer")
-                .expires_in(validityInMilliseconds)
+                .accessToken(token)
+                .tokenType("Bearer")
+                .role(role)
+                .expiresIn(validityInMilliseconds)
                 .build();
 
         return tokenDTO;

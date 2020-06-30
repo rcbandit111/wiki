@@ -18,9 +18,11 @@ public class AuthenticationTokenDTO {
 
     // Server Response data
 
-    private String access_token;
+    private String accessToken;
 
-    private String token_type;
+    private String tokenType;
 
-    private Long expires_in;
+    private String role;
+
+    private Long expiresIn;
 }
