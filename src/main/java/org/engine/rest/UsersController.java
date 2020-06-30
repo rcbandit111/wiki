@@ -12,12 +12,7 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.engine.dto.ActivatePasswordDTO;
-import org.engine.dto.ActivatePasswordTokenDTO;
-import org.engine.dto.AuthenticationDTO;
-import org.engine.dto.ResetPasswordDTO;
-import org.engine.dto.ResetPasswordTokenDTO;
-import org.engine.dto.ResetUserDTO;
+import org.engine.dto.*;
 import org.engine.mapper.UserMapper;
 import org.engine.production.entity.OldPasswords;
 import org.engine.production.entity.Users;
@@ -42,7 +37,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -99,7 +93,7 @@ public class UsersController {
      * @return
      */
     @PostMapping("/authorize")
-    public String login(@Valid @RequestBody AuthenticationDTO resetDTO) {
+    public AuthenticationTokenDTO login(@Valid @RequestBody AuthenticationDTO resetDTO) {
         // TODO... store the password as array for high security
         return userRestService.authorize(resetDTO.getName(), resetDTO.getPassword());
     }
@@ -111,7 +105,7 @@ public class UsersController {
      * @return
      */
     @GetMapping("/refresh")
-    public String refresh(HttpServletRequest req) {
+    public AuthenticationTokenDTO refresh(HttpServletRequest req) {
         return userRestService.refresh(req.getRemoteUser());
     }
 

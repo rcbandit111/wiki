@@ -1,5 +1,6 @@
 package org.engine.service;
 
+import org.engine.dto.AuthenticationTokenDTO;
 import org.engine.exception.EngineException;
 import org.engine.exception.ErrorDetail;
 import org.engine.production.entity.Users;
@@ -42,7 +43,7 @@ public class UserRestService {
      * @param password
      * @return
      */
-    public String authorize(String username, String password) {
+    public AuthenticationTokenDTO authorize(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
@@ -68,7 +69,7 @@ public class UserRestService {
      * @param username
      * @return
      */
-    public String refresh(String username) {
+    public AuthenticationTokenDTO refresh(String username) {
 
         Optional<Users> user = userService.findByLogin(username);
         if(!user.isPresent()){

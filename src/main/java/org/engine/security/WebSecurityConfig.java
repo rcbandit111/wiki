@@ -43,6 +43,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
         // Entry points
         http.authorizeRequests()
             .antMatchers(HttpMethod.POST,"/users/authorize").permitAll()
+            .antMatchers(HttpMethod.GET,"/users/refresh").permitAll()
             .antMatchers(HttpMethod.POST,"/users/reset_request").permitAll()
             .antMatchers(HttpMethod.POST,"/users/reset_token").permitAll()
             .antMatchers(HttpMethod.POST,"/users/reset_password").permitAll()
@@ -64,6 +65,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
         // WebSecurity is the second layer
         web.ignoring()
                 .antMatchers(HttpMethod.POST,"/users/authorize")
+                .antMatchers(HttpMethod.GET,"/users/refresh")
                 .antMatchers(HttpMethod.POST,"/users/reset_request")
                 .antMatchers(HttpMethod.POST,"/users/reset_token")
                 .antMatchers(HttpMethod.POST,"/users/reset_password")
