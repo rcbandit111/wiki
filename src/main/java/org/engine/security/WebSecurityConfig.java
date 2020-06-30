@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,6 +32,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
+        // HttpSecurity is the first layer
+
         // Disable CSRF (cross site request forgery)
         http.csrf().disable();
 
@@ -39,12 +42,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
 
         // Entry points
         http.authorizeRequests()
-            .antMatchers("/users/authorize").permitAll()
-            .antMatchers("/users/reset_request").permitAll()
-            .antMatchers("/users/reset_token").permitAll()
-            .antMatchers("/users/reset_password").permitAll()
-            .antMatchers("/users/confirmation_token").permitAll()
-            .antMatchers("/users/reset_user_password").permitAll()
+            .antMatchers(HttpMethod.POST,"/users/authorize").permitAll()
+            .antMatchers(HttpMethod.POST,"/users/reset_request").permitAll()
+            .antMatchers(HttpMethod.POST,"/users/reset_token").permitAll()
+            .antMatchers(HttpMethod.POST,"/users/reset_password").permitAll()
+            .antMatchers(HttpMethod.POST,"/users/confirmation_token").permitAll()
+            .antMatchers(HttpMethod.POST,"/users/reset_user_password").permitAll()
             // Disallow everything else..
             .anyRequest().authenticated();
 
@@ -57,13 +60,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        // Allow swagger to be accessed without authentication
-        web.ignoring().antMatchers("/v2/api-docs")
-            .antMatchers("/swagger-resources/**")
-            .antMatchers("/swagger-ui.html")
-            .antMatchers("/configuration/**")
-            .antMatchers("/webjars/**")
-            .antMatchers("/public");
+
+        // WebSecurity is the second layer
+        web.ignoring()
+                .antMatchers(HttpMethod.POST,"/users/authorize")
+                .antMatchers(HttpMethod.POST,"/users/reset_request")
+                .antMatchers(HttpMethod.POST,"/users/reset_token")
+                .antMatchers(HttpMethod.POST,"/users/reset_password")
+                .antMatchers(HttpMethod.POST,"/users/confirmation_token")
+                .antMatchers(HttpMethod.POST,"/users/reset_user_password");
     }
 
     @Bean
