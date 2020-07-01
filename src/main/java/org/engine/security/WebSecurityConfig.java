@@ -1,6 +1,7 @@
 package org.engine.security;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +15,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -37,19 +42,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
 
         // Disable CSRF (cross site request forgery)
         http.csrf().disable();
+        http.cors().disable();
 
         // No session will be created or used by spring security
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Entry points
         http.authorizeRequests()
-            .antMatchers(HttpMethod.POST,"/users/authorize").permitAll()
-            .antMatchers(HttpMethod.GET,"/users/refresh").permitAll()
-            .antMatchers(HttpMethod.POST,"/users/reset_request").permitAll()
-            .antMatchers(HttpMethod.POST,"/users/reset_token").permitAll()
-            .antMatchers(HttpMethod.POST,"/users/reset_password").permitAll()
-            .antMatchers(HttpMethod.POST,"/users/confirmation_token").permitAll()
-            .antMatchers(HttpMethod.POST,"/users/reset_user_password").permitAll()
+            .antMatchers("/users/authorize").permitAll()
+            .antMatchers("/users/refresh").permitAll()
+            .antMatchers("/users/reset_request").permitAll()
+            .antMatchers("/users/reset_token").permitAll()
+            .antMatchers("/users/reset_password").permitAll()
+            .antMatchers("/users/confirmation_token").permitAll()
+            .antMatchers("/users/reset_user_password").permitAll()
             // Disallow everything else..
             .anyRequest().authenticated();
 
@@ -65,13 +71,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
 
         // WebSecurity is the second layer
         web.ignoring()
-                .antMatchers(HttpMethod.POST,"/users/authorize")
-                .antMatchers(HttpMethod.GET,"/users/refresh")
-                .antMatchers(HttpMethod.POST,"/users/reset_request")
-                .antMatchers(HttpMethod.POST,"/users/reset_token")
-                .antMatchers(HttpMethod.POST,"/users/reset_password")
-                .antMatchers(HttpMethod.POST,"/users/confirmation_token")
-                .antMatchers(HttpMethod.POST,"/users/reset_user_password");
+                .antMatchers("/users/authorize")
+                .antMatchers("/users/refresh")
+                .antMatchers("/users/reset_request")
+                .antMatchers("/users/reset_token")
+                .antMatchers("/users/reset_password")
+                .antMatchers("/users/confirmation_token")
+                .antMatchers("/users/reset_user_password");
     }
 
     @Bean
@@ -90,14 +96,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements W
         registry.addMapping("/**");
     }
 
-    // TODO... the only working code. Find a way to update it.
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurerAdapter() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:4200");
-            }
-        };
-    }
 }
